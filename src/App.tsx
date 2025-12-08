@@ -9,6 +9,9 @@ import EquipmentDetail from "./pages/EquipmentDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import FarmerDashboard from "./pages/FarmerDashboard";
+import OwnerDashboard from "./pages/OwnerDashboard";
+import GPSTracking from "./pages/GPSTracking";
+import ChatBot from "./components/chatbot/ChatBot";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,8 +29,11 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<FarmerDashboard />} />
+          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+          <Route path="/tracking" element={<GPSTracking />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ChatBot />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
