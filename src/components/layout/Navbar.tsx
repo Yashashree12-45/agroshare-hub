@@ -207,3 +207,5 @@ export function Navbar() {
     </nav>
   );
 }
+
+export default Navbar;
