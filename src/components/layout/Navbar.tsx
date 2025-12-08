@@ -26,8 +26,10 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/equipment', label: t('nav.equipment') },
-    { href: '/#how-it-works', label: t('nav.howItWorks') },
-    { href: '/#pricing', label: t('nav.pricing') },
+    { href: '/ai-recommend', label: 'AI Recommend' },
+    { href: '/pricing', label: t('nav.pricing') },
+    { href: '/list-equipment', label: 'List Equipment' },
+    { href: '/wallet', label: 'Wallet' },
   ];
 
   const handleLogout = () => {
