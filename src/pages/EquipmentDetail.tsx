@@ -15,13 +15,17 @@ import {
   Wrench,
   Phone,
   MessageCircle,
+  Users,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { equipmentService, Equipment } from '@/services/api';
 import { BookingModal } from '@/components/booking/BookingModal';
+import { GroupBookingModal } from '@/components/booking/GroupBookingModal';
+import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 
 const EquipmentDetailPage = () => {
   const { id } = useParams();
@@ -31,6 +35,7 @@ const EquipmentDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
   const [showBooking, setShowBooking] = useState(false);
+  const [showGroupBooking, setShowGroupBooking] = useState(false);
 
   useEffect(() => {
     loadEquipment();
@@ -186,15 +191,28 @@ const EquipmentDetailPage = () => {
                     </div>
                   )}
                 </div>
-                <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={() => setShowBooking(true)}
-                  disabled={equipment.status !== 'available'}
-                >
-                  <Calendar className="w-5 h-5 mr-2" />
-                  {t('common.bookNow')}
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    size="lg"
+                    className="flex-1"
+                    onClick={() => setShowBooking(true)}
+                    disabled={equipment.status !== 'available'}
+                  >
+                    <Calendar className="w-5 h-5 mr-2" />
+                    {t('common.bookNow')}
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => setShowGroupBooking(true)}
+                    disabled={equipment.status !== 'available'}
+                  >
+                    <Users className="w-5 h-5" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  Click group icon to split costs with other farmers
+                </p>
               </div>
 
               {/* Features */}
@@ -296,6 +314,21 @@ const EquipmentDetailPage = () => {
               </div>
             </motion.div>
           </div>
+
+          {/* Reviews Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-12"
+          >
+            <h2 className="text-2xl font-bold mb-6">Reviews & Ratings</h2>
+            <ReviewsSection
+              equipmentId={equipment.id}
+              averageRating={equipment.rating}
+              totalReviews={equipment.totalReviews}
+            />
+          </motion.div>
         </div>
       </main>
 
@@ -306,6 +339,13 @@ const EquipmentDetailPage = () => {
         equipment={equipment}
         open={showBooking}
         onClose={() => setShowBooking(false)}
+      />
+
+      {/* Group Booking Modal */}
+      <GroupBookingModal
+        equipment={equipment}
+        open={showGroupBooking}
+        onClose={() => setShowGroupBooking(false)}
       />
     </div>
   );

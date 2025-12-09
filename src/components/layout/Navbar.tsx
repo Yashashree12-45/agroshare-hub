@@ -26,9 +26,10 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/equipment', label: t('nav.equipment') },
+    { href: '/dashboard', label: t('nav.dashboard') },
     { href: '/ai-recommend', label: 'AI Recommend' },
     { href: '/pricing', label: t('nav.pricing') },
-    { href: '/list-equipment', label: 'List Equipment' },
+    { href: '/tracking', label: 'GPS Tracking' },
     { href: '/wallet', label: 'Wallet' },
   ];
 

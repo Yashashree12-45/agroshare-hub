@@ -16,6 +16,7 @@ import Wallet from "./pages/Wallet";
 import Pricing from "./pages/Pricing";
 import ListEquipment from "./pages/ListEquipment";
 import ChatBot from "./components/chatbot/ChatBot";
+import { EmergencySupport } from "./components/support/EmergencySupport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ChatBot />
+        <EmergencySupport />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
