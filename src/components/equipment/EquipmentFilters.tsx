@@ -93,14 +93,14 @@ export function EquipmentFilters({ filters, onFilterChange }: EquipmentFiltersPr
       <div className="mb-6">
         <Label className="mb-2 block">Equipment Type</Label>
         <Select
-          value={filters.type}
-          onValueChange={(value) => updateFilter('type', value)}
+          value={filters.type || 'all'}
+          onValueChange={(value) => updateFilter('type', value === 'all' ? '' : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All types</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             {equipmentTypes.map((type) => (
               <SelectItem key={type.value} value={type.value}>
                 {type.label}
@@ -129,14 +129,14 @@ export function EquipmentFilters({ filters, onFilterChange }: EquipmentFiltersPr
       <div className="mb-6">
         <Label className="mb-2 block">Availability</Label>
         <Select
-          value={filters.status}
-          onValueChange={(value) => updateFilter('status', value)}
+          value={filters.status || 'any'}
+          onValueChange={(value) => updateFilter('status', value === 'any' ? '' : value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Any status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any status</SelectItem>
+            <SelectItem value="any">Any status</SelectItem>
             <SelectItem value="available">Available Now</SelectItem>
             <SelectItem value="booked">Booked</SelectItem>
           </SelectContent>
