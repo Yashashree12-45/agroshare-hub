@@ -75,9 +75,9 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Role Selection */}
             <div>
-              <Label className="mb-2 block">I am a</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['farmer', 'owner', 'admin'] as UserRole[]).map((r) => (
+              <Label className="mb-2 block">{t('login.iAmA')}</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {(['farmer', 'owner'] as UserRole[]).map((r) => (
                   <button
                     key={r}
                     type="button"
@@ -88,7 +88,7 @@ const LoginPage = () => {
                         : 'border-border hover:border-primary/50'
                     }`}
                   >
-                    {r}
+                    {t(`login.${r}`)}
                   </button>
                 ))}
               </div>
