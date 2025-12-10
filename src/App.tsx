@@ -15,6 +15,7 @@ import AIRecommendation from "./pages/AIRecommendation";
 import Wallet from "./pages/Wallet";
 import Pricing from "./pages/Pricing";
 import ListEquipment from "./pages/ListEquipment";
+import Settings from "./pages/Settings";
 import ChatBot from "./components/chatbot/ChatBot";
 import { EmergencySupport } from "./components/support/EmergencySupport";
 import NotFound from "./pages/NotFound";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/list-equipment" element={<ListEquipment />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ChatBot />

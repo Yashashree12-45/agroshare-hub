@@ -16,6 +16,9 @@ const languages = [
   { code: 'en', name: 'English' },
   { code: 'hi', name: 'हिंदी' },
   { code: 'mr', name: 'मराठी' },
+  { code: 'kn', name: 'ಕನ್ನಡ' },
+  { code: 'ta', name: 'தமிழ்' },
+  { code: 'te', name: 'తెలుగు' },
 ];
 
 export function Navbar() {
@@ -27,10 +30,11 @@ export function Navbar() {
   const navLinks = [
     { href: '/equipment', label: t('nav.equipment') },
     { href: '/dashboard', label: t('nav.dashboard') },
-    { href: '/ai-recommend', label: 'AI Recommend' },
+    { href: '/ai-recommend', label: t('nav.aiRecommend') },
     { href: '/pricing', label: t('nav.pricing') },
-    { href: '/tracking', label: 'GPS Tracking' },
-    { href: '/wallet', label: 'Wallet' },
+    { href: '/tracking', label: t('nav.tracking') },
+    { href: '/wallet', label: t('nav.wallet') },
+    { href: '/settings', label: t('nav.settings') },
   ];
 
   const handleLogout = () => {

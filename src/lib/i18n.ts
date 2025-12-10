@@ -12,7 +12,12 @@ const resources = {
         login: 'Login',
         signup: 'Sign Up',
         dashboard: 'Dashboard',
-        logout: 'Logout'
+        logout: 'Logout',
+        aiRecommend: 'AI Recommend',
+        wallet: 'Wallet',
+        tracking: 'GPS Tracking',
+        settings: 'Settings',
+        listEquipment: 'List Equipment'
       },
       hero: {
         title: 'Rent Farm Equipment',
@@ -92,7 +97,11 @@ const resources = {
         filter: 'Filter',
         sort: 'Sort',
         loading: 'Loading...',
-        noResults: 'No results found'
+        noResults: 'No results found',
+        save: 'Save',
+        cancel: 'Cancel',
+        confirm: 'Confirm',
+        back: 'Back'
       },
       booking: {
         selectDate: 'Select Date',
@@ -112,6 +121,101 @@ const resources = {
         wallet: 'Wallet',
         settings: 'Settings',
         notifications: 'Notifications'
+      },
+      settings: {
+        title: 'Settings',
+        subtitle: 'Manage your account settings and preferences',
+        profile: 'Profile',
+        language: 'Language',
+        notifications: 'Notifications',
+        security: 'Security',
+        editProfile: 'Edit Profile',
+        editProfileDesc: 'Update your personal information',
+        fullName: 'Full Name',
+        email: 'Email',
+        phone: 'Phone Number',
+        location: 'Location',
+        saveChanges: 'Save Changes',
+        profileUpdated: 'Profile Updated',
+        profileUpdatedDesc: 'Your profile has been updated successfully',
+        avatarChanged: 'Avatar Changed',
+        avatarChangedDesc: 'Your profile picture has been updated',
+        languageSettings: 'Language Preferences',
+        languageSettingsDesc: 'Choose your preferred language for the application',
+        selectLanguage: 'Select Language',
+        languageChanged: 'Language Changed',
+        languageChangedDesc: 'Application language has been updated',
+        languageNote: 'The entire application will be displayed in your selected language',
+        notificationSettings: 'Notification Preferences',
+        notificationSettingsDesc: 'Control how you receive notifications',
+        bookingUpdates: 'Booking Updates',
+        bookingUpdatesDesc: 'Receive updates about your bookings',
+        promotions: 'Promotions & Offers',
+        promotionsDesc: 'Get notified about deals and discounts',
+        reminders: 'Reminders',
+        remindersDesc: 'Booking reminders and due payments',
+        channels: 'Notification Channels',
+        smsNotifications: 'SMS Notifications',
+        emailNotifications: 'Email Notifications',
+        securitySettings: 'Security Settings',
+        securitySettingsDesc: 'Manage your account security',
+        twoFactor: 'Two-Factor Authentication',
+        twoFactorDesc: 'Add an extra layer of security to your account',
+        loginAlerts: 'Login Alerts',
+        loginAlertsDesc: 'Get notified of new logins to your account',
+        changePassword: 'Change Password'
+      },
+      tracking: {
+        title: 'Live Tracking',
+        booking: 'Booking',
+        estimatedArrival: 'Estimated Arrival',
+        arrived: 'Arrived!',
+        distanceLeft: 'Distance Left',
+        fuelLevel: 'Fuel Level',
+        equipmentDetails: 'Equipment Details',
+        operator: 'Operator',
+        refresh: 'Refresh',
+        shareLocation: 'Share Location',
+        inTransit: 'In Transit',
+        name: 'Name',
+        type: 'Type'
+      },
+      wallet: {
+        title: 'My Wallet',
+        balance: 'Available Balance',
+        addMoney: 'Add Money',
+        sendMoney: 'Send Money',
+        transactions: 'Transaction History',
+        amount: 'Amount',
+        upiId: 'UPI ID',
+        recipient: 'Recipient UPI ID',
+        processing: 'Processing...',
+        success: 'Transaction Successful',
+        noTransactions: 'No transactions yet'
+      },
+      equipment: {
+        title: 'Browse Equipment',
+        subtitle: 'Find the right equipment for your farm',
+        filters: 'Filters',
+        type: 'Equipment Type',
+        allTypes: 'All Types',
+        availability: 'Availability',
+        anyStatus: 'Any Status',
+        priceRange: 'Price Range',
+        rating: 'Rating',
+        location: 'Location'
+      },
+      aiRecommend: {
+        title: 'AI Equipment Recommendation',
+        subtitle: 'Get personalized equipment suggestions based on your needs',
+        cropType: 'Crop Type',
+        landSize: 'Land Size (acres)',
+        budget: 'Budget (₹)',
+        soilType: 'Soil Type',
+        farmingStage: 'Farming Stage',
+        getRecommendations: 'Get Recommendations',
+        recommendations: 'Recommended Equipment',
+        matchScore: 'Match Score'
       }
     }
   },
@@ -125,12 +229,17 @@ const resources = {
         login: 'लॉग इन',
         signup: 'साइन अप',
         dashboard: 'डैशबोर्ड',
-        logout: 'लॉग आउट'
+        logout: 'लॉग आउट',
+        aiRecommend: 'AI सुझाव',
+        wallet: 'वॉलेट',
+        tracking: 'GPS ट्रैकिंग',
+        settings: 'सेटिंग्स',
+        listEquipment: 'उपकरण लिस्ट करें'
       },
       hero: {
         title: 'खेती के उपकरण किराए पर लें',
         titleHighlight: 'बिना किसी परेशानी के',
-        subtitle: 'स्थानीय उपकरण मालिकों से जुड़ें, ट्रैक्टर, हार्वेस्टर, ड्रोन और बहुत कुछ बुक करें।',
+        subtitle: 'स्थानीय उपकरण मालिकों से जुड़ें, ट्रैक्टर, हार्वेस्टर, ड्रोन और बहुत कुछ बुक करें। समुदाय साझाकरण के माध्यम से पैसे बचाएं।',
         cta: 'उपकरण खोजें',
         ctaSecondary: 'अपना उपकरण लिस्ट करें',
         stats: {
@@ -139,6 +248,58 @@ const resources = {
           villages: 'गांव कवर',
           saved: 'बचत'
         }
+      },
+      features: {
+        title: 'आपको जो कुछ भी चाहिए',
+        subtitle: 'खोज से बुकिंग से भुगतान तक – हम खेत उपकरण किराए को सरल बनाते हैं',
+        smartBooking: 'स्मार्ट बुकिंग',
+        smartBookingDesc: 'तुरंत उपकरण बुक करें। रीयल-टाइम उपलब्धता और स्वचालित शेड्यूलिंग।',
+        gpsTracking: 'GPS ट्रैकिंग',
+        gpsTrackingDesc: 'अपने किराए के उपकरण को रीयल-टाइम में ट्रैक करें।',
+        groupSharing: 'समूह साझाकरण',
+        groupSharingDesc: 'पड़ोसी किसानों के साथ लागत बांटें।',
+        securePayments: 'सुरक्षित भुगतान',
+        securePaymentsDesc: 'UPI, कार्ड, या वॉलेट से भुगतान करें।',
+        operatorIncluded: 'ऑपरेटर शामिल',
+        operatorIncludedDesc: 'कुशल ऑपरेटर चाहिए? प्रशिक्षित पेशेवरों के साथ बुक करें।',
+        support: '24/7 सहायता',
+        supportDesc: 'आपातकालीन ब्रेकडाउन? हमारी टीम हमेशा मदद के लिए तैयार है।'
+      },
+      howItWorks: {
+        title: 'कैसे काम करता है',
+        subtitle: 'तीन सरल चरणों में शुरू करें',
+        step1: 'खोजें',
+        step1Desc: 'प्रकार, स्थान और उपलब्धता के अनुसार अपने पास उपकरण खोजें',
+        step2: 'बुक करें',
+        step2Desc: 'अपना समय स्लॉट चुनें, ऑपरेटर जोड़ें, और पुष्टि करें',
+        step3: 'उपयोग करें',
+        step3Desc: 'उपकरण आपके खेत में आता है, रीयल-टाइम में ट्रैक करें'
+      },
+      categories: {
+        title: 'उपकरण श्रेणियां',
+        tractors: 'ट्रैक्टर',
+        harvesters: 'हार्वेस्टर',
+        drones: 'ड्रोन',
+        tillers: 'टिलर',
+        sprayers: 'स्प्रेयर',
+        pumps: 'पानी पंप'
+      },
+      testimonials: {
+        title: 'किसान क्या कहते हैं',
+        subtitle: 'हजारों संतुष्ट किसानों से जुड़ें'
+      },
+      cta: {
+        title: 'शुरू करने के लिए तैयार हैं?',
+        subtitle: 'उपकरण किराए पर पैसे बचाने वाले हजारों किसानों से जुड़ें',
+        button: 'आज मुफ्त शुरू करें'
+      },
+      footer: {
+        description: 'हर किसान के लिए खेत उपकरण सुलभ बनाना',
+        product: 'उत्पाद',
+        company: 'कंपनी',
+        support: 'सहायता',
+        legal: 'कानूनी',
+        copyright: '© 2024 AgroToolAccess. सर्वाधिकार सुरक्षित।'
       },
       common: {
         perHour: '/घंटा',
@@ -153,7 +314,125 @@ const resources = {
         filter: 'फ़िल्टर',
         sort: 'क्रमबद्ध',
         loading: 'लोड हो रहा है...',
-        noResults: 'कोई परिणाम नहीं मिला'
+        noResults: 'कोई परिणाम नहीं मिला',
+        save: 'सहेजें',
+        cancel: 'रद्द करें',
+        confirm: 'पुष्टि करें',
+        back: 'वापस'
+      },
+      booking: {
+        selectDate: 'तारीख चुनें',
+        selectTime: 'समय स्लॉट चुनें',
+        duration: 'अवधि',
+        withOperator: 'ऑपरेटर के साथ',
+        totalCost: 'कुल लागत',
+        confirm: 'बुकिंग की पुष्टि करें',
+        success: 'बुकिंग पुष्ट!',
+        pending: 'अनुमोदन लंबित'
+      },
+      dashboard: {
+        welcome: 'वापसी पर स्वागत है',
+        myBookings: 'मेरी बुकिंग',
+        myEquipment: 'मेरा उपकरण',
+        earnings: 'कमाई',
+        wallet: 'वॉलेट',
+        settings: 'सेटिंग्स',
+        notifications: 'सूचनाएं'
+      },
+      settings: {
+        title: 'सेटिंग्स',
+        subtitle: 'अपने खाते की सेटिंग्स और प्राथमिकताएं प्रबंधित करें',
+        profile: 'प्रोफ़ाइल',
+        language: 'भाषा',
+        notifications: 'सूचनाएं',
+        security: 'सुरक्षा',
+        editProfile: 'प्रोफ़ाइल संपादित करें',
+        editProfileDesc: 'अपनी व्यक्तिगत जानकारी अपडेट करें',
+        fullName: 'पूरा नाम',
+        email: 'ईमेल',
+        phone: 'फोन नंबर',
+        location: 'स्थान',
+        saveChanges: 'परिवर्तन सहेजें',
+        profileUpdated: 'प्रोफ़ाइल अपडेट',
+        profileUpdatedDesc: 'आपकी प्रोफ़ाइल सफलतापूर्वक अपडेट हो गई है',
+        avatarChanged: 'अवतार बदला गया',
+        avatarChangedDesc: 'आपकी प्रोफ़ाइल तस्वीर अपडेट हो गई है',
+        languageSettings: 'भाषा प्राथमिकताएं',
+        languageSettingsDesc: 'एप्लिकेशन के लिए अपनी पसंदीदा भाषा चुनें',
+        selectLanguage: 'भाषा चुनें',
+        languageChanged: 'भाषा बदली गई',
+        languageChangedDesc: 'एप्लिकेशन भाषा अपडेट हो गई है',
+        languageNote: 'पूरा एप्लिकेशन आपकी चुनी हुई भाषा में दिखाई देगा',
+        notificationSettings: 'सूचना प्राथमिकताएं',
+        notificationSettingsDesc: 'नियंत्रित करें कि आपको सूचनाएं कैसे मिलें',
+        bookingUpdates: 'बुकिंग अपडेट',
+        bookingUpdatesDesc: 'अपनी बुकिंग के बारे में अपडेट प्राप्त करें',
+        promotions: 'प्रमोशन और ऑफर',
+        promotionsDesc: 'सौदों और छूट के बारे में सूचित रहें',
+        reminders: 'रिमाइंडर',
+        remindersDesc: 'बुकिंग रिमाइंडर और देय भुगतान',
+        channels: 'सूचना चैनल',
+        smsNotifications: 'SMS सूचनाएं',
+        emailNotifications: 'ईमेल सूचनाएं',
+        securitySettings: 'सुरक्षा सेटिंग्स',
+        securitySettingsDesc: 'अपने खाते की सुरक्षा प्रबंधित करें',
+        twoFactor: 'दो-कारक प्रमाणीकरण',
+        twoFactorDesc: 'अपने खाते में सुरक्षा की एक अतिरिक्त परत जोड़ें',
+        loginAlerts: 'लॉगिन अलर्ट',
+        loginAlertsDesc: 'अपने खाते में नए लॉगिन की सूचना प्राप्त करें',
+        changePassword: 'पासवर्ड बदलें'
+      },
+      tracking: {
+        title: 'लाइव ट्रैकिंग',
+        booking: 'बुकिंग',
+        estimatedArrival: 'अनुमानित आगमन',
+        arrived: 'पहुंच गया!',
+        distanceLeft: 'शेष दूरी',
+        fuelLevel: 'ईंधन स्तर',
+        equipmentDetails: 'उपकरण विवरण',
+        operator: 'ऑपरेटर',
+        refresh: 'रिफ्रेश',
+        shareLocation: 'स्थान साझा करें',
+        inTransit: 'रास्ते में',
+        name: 'नाम',
+        type: 'प्रकार'
+      },
+      wallet: {
+        title: 'मेरा वॉलेट',
+        balance: 'उपलब्ध शेष',
+        addMoney: 'पैसे जोड़ें',
+        sendMoney: 'पैसे भेजें',
+        transactions: 'लेनदेन इतिहास',
+        amount: 'राशि',
+        upiId: 'UPI ID',
+        recipient: 'प्राप्तकर्ता UPI ID',
+        processing: 'प्रोसेसिंग...',
+        success: 'लेनदेन सफल',
+        noTransactions: 'अभी तक कोई लेनदेन नहीं'
+      },
+      equipment: {
+        title: 'उपकरण ब्राउज़ करें',
+        subtitle: 'अपने खेत के लिए सही उपकरण खोजें',
+        filters: 'फ़िल्टर',
+        type: 'उपकरण प्रकार',
+        allTypes: 'सभी प्रकार',
+        availability: 'उपलब्धता',
+        anyStatus: 'कोई भी स्थिति',
+        priceRange: 'मूल्य सीमा',
+        rating: 'रेटिंग',
+        location: 'स्थान'
+      },
+      aiRecommend: {
+        title: 'AI उपकरण सुझाव',
+        subtitle: 'अपनी जरूरतों के आधार पर व्यक्तिगत उपकरण सुझाव प्राप्त करें',
+        cropType: 'फसल का प्रकार',
+        landSize: 'भूमि का आकार (एकड़)',
+        budget: 'बजट (₹)',
+        soilType: 'मिट्टी का प्रकार',
+        farmingStage: 'खेती का चरण',
+        getRecommendations: 'सुझाव प्राप्त करें',
+        recommendations: 'अनुशंसित उपकरण',
+        matchScore: 'मैच स्कोर'
       }
     }
   },
@@ -167,14 +446,345 @@ const resources = {
         login: 'लॉग इन',
         signup: 'साइन अप',
         dashboard: 'डॅशबोर्ड',
-        logout: 'लॉग आउट'
+        logout: 'लॉग आउट',
+        aiRecommend: 'AI सुचना',
+        wallet: 'वॉलेट',
+        tracking: 'GPS ट्रॅकिंग',
+        settings: 'सेटिंग्ज',
+        listEquipment: 'साधने सूचीबद्ध करा'
       },
       hero: {
         title: 'शेती उपकरणे भाड्याने घ्या',
         titleHighlight: 'कोणत्याही त्रासाशिवाय',
-        subtitle: 'स्थानिक उपकरण मालकांशी जोडा, ट्रॅक्टर, हार्वेस्टर, ड्रोन आणि बरेच काही बुक करा।',
+        subtitle: 'स्थानिक उपकरण मालकांशी जोडा, ट्रॅक्टर, हार्वेस्टर, ड्रोन आणि बरेच काही बुक करा। समुदाय सामायिकरणातून पैसे वाचवा।',
         cta: 'साधने शोधा',
-        ctaSecondary: 'तुमची साधने सूचीबद्ध करा'
+        ctaSecondary: 'तुमची साधने सूचीबद्ध करा',
+        stats: {
+          equipment: 'सूचीबद्ध साधने',
+          farmers: 'सक्रिय शेतकरी',
+          villages: 'गावे कव्हर',
+          saved: 'बचत'
+        }
+      },
+      features: {
+        title: 'तुम्हाला जे हवे ते सर्व',
+        subtitle: 'शोध ते बुकिंग ते पेमेंट – आम्ही शेती उपकरणे भाडे सोपे करतो',
+        smartBooking: 'स्मार्ट बुकिंग',
+        smartBookingDesc: 'उपकरणे लगेच बुक करा। रिअल-टाइम उपलब्धता।',
+        gpsTracking: 'GPS ट्रॅकिंग',
+        gpsTrackingDesc: 'तुमची भाड्याची उपकरणे रिअल-टाइममध्ये ट्रॅक करा।',
+        groupSharing: 'ग्रुप शेअरिंग',
+        groupSharingDesc: 'शेजारच्या शेतकऱ्यांसोबत खर्च विभाजित करा।',
+        securePayments: 'सुरक्षित पेमेंट',
+        securePaymentsDesc: 'UPI, कार्ड किंवा वॉलेटद्वारे पेमेंट करा।',
+        operatorIncluded: 'ऑपरेटर समाविष्ट',
+        operatorIncludedDesc: 'कुशल ऑपरेटर हवा? प्रशिक्षित व्यावसायिकांसह बुक करा।',
+        support: '24/7 सपोर्ट',
+        supportDesc: 'आणीबाणी ब्रेकडाउन? आमची टीम नेहमी मदतीसाठी तयार आहे।'
+      },
+      howItWorks: {
+        title: 'कसे काम करते',
+        subtitle: 'तीन सोप्या चरणांमध्ये सुरू करा',
+        step1: 'शोधा',
+        step1Desc: 'प्रकार, स्थान आणि उपलब्धतेनुसार जवळची उपकरणे शोधा',
+        step2: 'बुक करा',
+        step2Desc: 'तुमचा टाइम स्लॉट निवडा, ऑपरेटर जोडा आणि पुष्टी करा',
+        step3: 'वापरा',
+        step3Desc: 'उपकरण तुमच्या शेतात येते, रिअल-टाइममध्ये ट्रॅक करा'
+      },
+      categories: {
+        title: 'उपकरण श्रेण्या',
+        tractors: 'ट्रॅक्टर',
+        harvesters: 'हार्वेस्टर',
+        drones: 'ड्रोन',
+        tillers: 'टिलर',
+        sprayers: 'स्प्रेयर',
+        pumps: 'पाणी पंप'
+      },
+      testimonials: {
+        title: 'शेतकरी काय म्हणतात',
+        subtitle: 'हजारो समाधानी शेतकऱ्यांमध्ये सामील व्हा'
+      },
+      cta: {
+        title: 'सुरू करण्यास तयार आहात?',
+        subtitle: 'उपकरण भाड्यावर पैसे वाचवणाऱ्या हजारो शेतकऱ्यांमध्ये सामील व्हा',
+        button: 'आज मोफत सुरू करा'
+      },
+      footer: {
+        description: 'प्रत्येक शेतकऱ्यासाठी शेती उपकरणे सुलभ करणे',
+        product: 'उत्पादन',
+        company: 'कंपनी',
+        support: 'सपोर्ट',
+        legal: 'कायदेशीर',
+        copyright: '© 2024 AgroToolAccess. सर्व हक्क राखीव।'
+      },
+      common: {
+        perHour: '/तास',
+        perDay: '/दिवस',
+        perAcre: '/एकर',
+        available: 'उपलब्ध',
+        booked: 'बुक केले',
+        inUse: 'वापरात',
+        bookNow: 'आता बुक करा',
+        viewDetails: 'तपशील पहा',
+        search: 'शोधा',
+        filter: 'फिल्टर',
+        sort: 'क्रमवारी',
+        loading: 'लोड होत आहे...',
+        noResults: 'परिणाम सापडले नाहीत',
+        save: 'जतन करा',
+        cancel: 'रद्द करा',
+        confirm: 'पुष्टी करा',
+        back: 'मागे'
+      },
+      booking: {
+        selectDate: 'तारीख निवडा',
+        selectTime: 'वेळ स्लॉट निवडा',
+        duration: 'कालावधी',
+        withOperator: 'ऑपरेटरसह',
+        totalCost: 'एकूण खर्च',
+        confirm: 'बुकिंग पुष्टी करा',
+        success: 'बुकिंग पुष्टी!',
+        pending: 'मंजुरी प्रलंबित'
+      },
+      dashboard: {
+        welcome: 'पुन्हा स्वागत',
+        myBookings: 'माझ्या बुकिंग',
+        myEquipment: 'माझी उपकरणे',
+        earnings: 'कमाई',
+        wallet: 'वॉलेट',
+        settings: 'सेटिंग्ज',
+        notifications: 'सूचना'
+      },
+      settings: {
+        title: 'सेटिंग्ज',
+        subtitle: 'तुमच्या खात्याच्या सेटिंग्ज आणि प्राधान्ये व्यवस्थापित करा',
+        profile: 'प्रोफाइल',
+        language: 'भाषा',
+        notifications: 'सूचना',
+        security: 'सुरक्षा',
+        editProfile: 'प्रोफाइल संपादित करा',
+        editProfileDesc: 'तुमची वैयक्तिक माहिती अपडेट करा',
+        fullName: 'पूर्ण नाव',
+        email: 'ईमेल',
+        phone: 'फोन नंबर',
+        location: 'स्थान',
+        saveChanges: 'बदल जतन करा',
+        profileUpdated: 'प्रोफाइल अपडेट',
+        profileUpdatedDesc: 'तुमचे प्रोफाइल यशस्वीरित्या अपडेट झाले',
+        avatarChanged: 'अवतार बदलला',
+        avatarChangedDesc: 'तुमचे प्रोफाइल चित्र अपडेट झाले',
+        languageSettings: 'भाषा प्राधान्ये',
+        languageSettingsDesc: 'अॅप्लिकेशनसाठी तुमची पसंतीची भाषा निवडा',
+        selectLanguage: 'भाषा निवडा',
+        languageChanged: 'भाषा बदलली',
+        languageChangedDesc: 'अॅप्लिकेशन भाषा अपडेट झाली',
+        languageNote: 'संपूर्ण अॅप्लिकेशन तुमच्या निवडलेल्या भाषेत दिसेल',
+        notificationSettings: 'सूचना प्राधान्ये',
+        notificationSettingsDesc: 'तुम्हाला सूचना कशा मिळतात ते नियंत्रित करा',
+        bookingUpdates: 'बुकिंग अपडेट्स',
+        bookingUpdatesDesc: 'तुमच्या बुकिंगबद्दल अपडेट्स मिळवा',
+        promotions: 'प्रमोशन आणि ऑफर्स',
+        promotionsDesc: 'डील्स आणि डिस्काउंट्सबद्दल सूचित व्हा',
+        reminders: 'रिमाइंडर्स',
+        remindersDesc: 'बुकिंग रिमाइंडर्स आणि देय पेमेंट्स',
+        channels: 'सूचना चॅनेल्स',
+        smsNotifications: 'SMS सूचना',
+        emailNotifications: 'ईमेल सूचना',
+        securitySettings: 'सुरक्षा सेटिंग्ज',
+        securitySettingsDesc: 'तुमच्या खात्याची सुरक्षा व्यवस्थापित करा',
+        twoFactor: 'दोन-घटक प्रमाणीकरण',
+        twoFactorDesc: 'तुमच्या खात्यात सुरक्षिततेचा अतिरिक्त स्तर जोडा',
+        loginAlerts: 'लॉगिन अलर्ट्स',
+        loginAlertsDesc: 'तुमच्या खात्यात नवीन लॉगिनची सूचना मिळवा',
+        changePassword: 'पासवर्ड बदला'
+      },
+      tracking: {
+        title: 'लाइव्ह ट्रॅकिंग',
+        booking: 'बुकिंग',
+        estimatedArrival: 'अंदाजे आगमन',
+        arrived: 'पोहोचले!',
+        distanceLeft: 'उर्वरित अंतर',
+        fuelLevel: 'इंधन पातळी',
+        equipmentDetails: 'उपकरण तपशील',
+        operator: 'ऑपरेटर',
+        refresh: 'रिफ्रेश',
+        shareLocation: 'स्थान शेअर करा',
+        inTransit: 'प्रवासात',
+        name: 'नाव',
+        type: 'प्रकार'
+      },
+      wallet: {
+        title: 'माझे वॉलेट',
+        balance: 'उपलब्ध शिल्लक',
+        addMoney: 'पैसे जोडा',
+        sendMoney: 'पैसे पाठवा',
+        transactions: 'व्यवहार इतिहास',
+        amount: 'रक्कम',
+        upiId: 'UPI ID',
+        recipient: 'प्राप्तकर्ता UPI ID',
+        processing: 'प्रक्रिया...',
+        success: 'व्यवहार यशस्वी',
+        noTransactions: 'अद्याप कोणतेही व्यवहार नाहीत'
+      },
+      equipment: {
+        title: 'उपकरणे ब्राउझ करा',
+        subtitle: 'तुमच्या शेतासाठी योग्य उपकरण शोधा',
+        filters: 'फिल्टर्स',
+        type: 'उपकरण प्रकार',
+        allTypes: 'सर्व प्रकार',
+        availability: 'उपलब्धता',
+        anyStatus: 'कोणतीही स्थिती',
+        priceRange: 'किंमत श्रेणी',
+        rating: 'रेटिंग',
+        location: 'स्थान'
+      },
+      aiRecommend: {
+        title: 'AI उपकरण सुचना',
+        subtitle: 'तुमच्या गरजांवर आधारित वैयक्तिकृत उपकरण सुचना मिळवा',
+        cropType: 'पीक प्रकार',
+        landSize: 'जमीन आकार (एकर)',
+        budget: 'बजेट (₹)',
+        soilType: 'माती प्रकार',
+        farmingStage: 'शेती टप्पा',
+        getRecommendations: 'सुचना मिळवा',
+        recommendations: 'शिफारस केलेली उपकरणे',
+        matchScore: 'मॅच स्कोअर'
+      }
+    }
+  },
+  kn: {
+    translation: {
+      nav: {
+        home: 'ಮುಖಪುಟ',
+        equipment: 'ಉಪಕರಣಗಳು',
+        howItWorks: 'ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ',
+        pricing: 'ಬೆಲೆ',
+        login: 'ಲಾಗಿನ್',
+        signup: 'ಸೈನ್ ಅಪ್',
+        dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+        logout: 'ಲಾಗ್ ಔಟ್',
+        aiRecommend: 'AI ಸಲಹೆ',
+        wallet: 'ವಾಲೆಟ್',
+        tracking: 'GPS ಟ್ರ್ಯಾಕಿಂಗ್',
+        settings: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+        listEquipment: 'ಉಪಕರಣ ಪಟ್ಟಿ'
+      },
+      hero: {
+        title: 'ಕೃಷಿ ಉಪಕರಣಗಳನ್ನು ಬಾಡಿಗೆಗೆ ಪಡೆಯಿರಿ',
+        titleHighlight: 'ಯಾವುದೇ ತೊಂದರೆ ಇಲ್ಲದೆ',
+        subtitle: 'ಸ್ಥಳೀಯ ಉಪಕರಣ ಮಾಲೀಕರೊಂದಿಗೆ ಸಂಪರ್ಕಿಸಿ, ಟ್ರ್ಯಾಕ್ಟರ್, ಹಾರ್ವೆಸ್ಟರ್, ಡ್ರೋನ್ ಮತ್ತು ಇನ್ನಷ್ಟು ಬುಕ್ ಮಾಡಿ।',
+        cta: 'ಉಪಕರಣ ಹುಡುಕಿ',
+        ctaSecondary: 'ನಿಮ್ಮ ಉಪಕರಣ ಪಟ್ಟಿ ಮಾಡಿ'
+      },
+      common: {
+        perHour: '/ಗಂಟೆ',
+        perDay: '/ದಿನ',
+        available: 'ಲಭ್ಯ',
+        booked: 'ಬುಕ್ ಆಗಿದೆ',
+        bookNow: 'ಈಗ ಬುಕ್ ಮಾಡಿ',
+        viewDetails: 'ವಿವರಗಳನ್ನು ನೋಡಿ',
+        search: 'ಹುಡುಕಿ',
+        loading: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...'
+      },
+      settings: {
+        title: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+        subtitle: 'ನಿಮ್ಮ ಖಾತೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ',
+        profile: 'ಪ್ರೊಫೈಲ್',
+        language: 'ಭಾಷೆ',
+        notifications: 'ಅಧಿಸೂಚನೆಗಳು',
+        security: 'ಭದ್ರತೆ',
+        saveChanges: 'ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ'
+      }
+    }
+  },
+  ta: {
+    translation: {
+      nav: {
+        home: 'முகப்பு',
+        equipment: 'உபகரணங்கள்',
+        howItWorks: 'எப்படி வேலை செய்கிறது',
+        pricing: 'விலை',
+        login: 'உள்நுழைவு',
+        signup: 'பதிவு செய்க',
+        dashboard: 'டாஷ்போர்ட்',
+        logout: 'வெளியேறு',
+        aiRecommend: 'AI பரிந்துரை',
+        wallet: 'வாலட்',
+        tracking: 'GPS கண்காணிப்பு',
+        settings: 'அமைப்புகள்',
+        listEquipment: 'உபகரணம் பட்டியல்'
+      },
+      hero: {
+        title: 'விவசாய உபகரணங்களை வாடகைக்கு எடுங்கள்',
+        titleHighlight: 'எந்த தொந்தரவும் இல்லாமல்',
+        subtitle: 'உள்ளூர் உபகரண உரிமையாளர்களுடன் இணையுங்கள், டிராக்டர், அறுவடை இயந்திரம், ட்ரோன் மற்றும் பலவற்றை முன்பதிவு செய்யுங்கள்।',
+        cta: 'உபகரணம் கண்டுபிடி',
+        ctaSecondary: 'உங்கள் உபகரணத்தை பட்டியலிடுங்கள்'
+      },
+      common: {
+        perHour: '/மணி',
+        perDay: '/நாள்',
+        available: 'கிடைக்கும்',
+        booked: 'முன்பதிவு செய்யப்பட்டது',
+        bookNow: 'இப்போது முன்பதிவு செய்',
+        viewDetails: 'விவரங்களைப் பார்க்க',
+        search: 'தேடு',
+        loading: 'ஏற்றுகிறது...'
+      },
+      settings: {
+        title: 'அமைப்புகள்',
+        subtitle: 'உங்கள் கணக்கு அமைப்புகளை நிர்வகிக்கவும்',
+        profile: 'சுயவிவரம்',
+        language: 'மொழி',
+        notifications: 'அறிவிப்புகள்',
+        security: 'பாதுகாப்பு',
+        saveChanges: 'மாற்றங்களைச் சேமி'
+      }
+    }
+  },
+  te: {
+    translation: {
+      nav: {
+        home: 'హోమ్',
+        equipment: 'పరికరాలు',
+        howItWorks: 'ఎలా పని చేస్తుంది',
+        pricing: 'ధర',
+        login: 'లాగిన్',
+        signup: 'సైన్ అప్',
+        dashboard: 'డాష్‌బోర్డ్',
+        logout: 'లాగ్ అవుట్',
+        aiRecommend: 'AI సిఫారసు',
+        wallet: 'వాలెట్',
+        tracking: 'GPS ట్రాకింగ్',
+        settings: 'సెట్టింగ్‌లు',
+        listEquipment: 'పరికరం జాబితా'
+      },
+      hero: {
+        title: 'వ్యవసాయ పరికరాలను అద్దెకు తీసుకోండి',
+        titleHighlight: 'ఎటువంటి ఇబ్బంది లేకుండా',
+        subtitle: 'స్థానిక పరికర యజమానులతో కనెక్ట్ అవ్వండి, ట్రాక్టర్, హార్వెస్టర్, డ్రోన్ మరియు మరిన్నింటిని బుక్ చేయండి।',
+        cta: 'పరికరాన్ని కనుగొనండి',
+        ctaSecondary: 'మీ పరికరాన్ని జాబితా చేయండి'
+      },
+      common: {
+        perHour: '/గంట',
+        perDay: '/రోజు',
+        available: 'అందుబాటులో',
+        booked: 'బుక్ చేయబడింది',
+        bookNow: 'ఇప్పుడే బుక్ చేయండి',
+        viewDetails: 'వివరాలు చూడండి',
+        search: 'వెతకండి',
+        loading: 'లోడ్ అవుతోంది...'
+      },
+      settings: {
+        title: 'సెట్టింగ్‌లు',
+        subtitle: 'మీ ఖాతా సెట్టింగ్‌లను నిర్వహించండి',
+        profile: 'ప్రొఫైల్',
+        language: 'భాష',
+        notifications: 'నోటిఫికేషన్లు',
+        security: 'భద్రత',
+        saveChanges: 'మార్పులను సేవ్ చేయండి'
       }
     }
   }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { ArrowLeft, Navigation, Clock, Fuel, Phone, MapPin, RefreshCw } from 'lucide-react';
@@ -54,6 +55,7 @@ const MapUpdater = ({ center }: { center: [number, number] }) => {
 
 const GPSTracking = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const bookingId = searchParams.get('booking') || 'BK-2024-001';
   
@@ -116,15 +118,15 @@ const GPSTracking = () => {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Live Tracking</h1>
-                <p className="text-muted-foreground">Booking: {bookingId}</p>
+                <h1 className="text-2xl font-bold text-foreground">{t('tracking.title')}</h1>
+                <p className="text-muted-foreground">{t('tracking.booking')}: {bookingId}</p>
               </div>
             </div>
             <Badge 
               variant={mockEquipment.status === 'Arrived' ? 'default' : 'secondary'}
               className="text-sm"
             >
-              {mockEquipment.status}
+              {mockEquipment.status === 'Arrived' ? t('tracking.arrived') : t('tracking.inTransit')}
             </Badge>
           </div>
 
@@ -188,9 +190,9 @@ const GPSTracking = () => {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <Clock className="h-8 w-8 mx-auto mb-2 opacity-80" />
-                    <p className="text-sm opacity-80">Estimated Arrival</p>
+                    <p className="text-sm opacity-80">{t('tracking.estimatedArrival')}</p>
                     <p className="text-3xl font-bold">
-                      {mockEquipment.status === 'Arrived' ? 'Arrived!' : `${estimatedTime} min`}
+                      {mockEquipment.status === 'Arrived' ? t('tracking.arrived') : `${estimatedTime} min`}
                     </p>
                   </div>
                 </CardContent>
@@ -201,12 +203,12 @@ const GPSTracking = () => {
                 <CardContent className="pt-6 grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <Navigation className="h-6 w-6 mx-auto mb-1 text-primary" />
-                    <p className="text-xs text-muted-foreground">Distance Left</p>
+                    <p className="text-xs text-muted-foreground">{t('tracking.distanceLeft')}</p>
                     <p className="text-lg font-semibold">{remainingDistance} km</p>
                   </div>
                   <div className="text-center">
                     <Fuel className="h-6 w-6 mx-auto mb-1 text-accent" />
-                    <p className="text-xs text-muted-foreground">Fuel Level</p>
+                    <p className="text-xs text-muted-foreground">{t('tracking.fuelLevel')}</p>
                     <p className="text-lg font-semibold">{mockEquipment.fuelLevel}%</p>
                   </div>
                 </CardContent>
@@ -215,15 +217,15 @@ const GPSTracking = () => {
               {/* Equipment Info */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Equipment Details</CardTitle>
+                  <CardTitle className="text-base">{t('tracking.equipmentDetails')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Name</span>
+                    <span className="text-muted-foreground">{t('tracking.name')}</span>
                     <span className="font-medium">{mockEquipment.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Type</span>
+                    <span className="text-muted-foreground">{t('tracking.type')}</span>
                     <span className="font-medium">{mockEquipment.type}</span>
                   </div>
                 </CardContent>
@@ -232,7 +234,7 @@ const GPSTracking = () => {
               {/* Operator Info */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Operator</CardTitle>
+                  <CardTitle className="text-base">{t('tracking.operator')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3">
@@ -263,11 +265,11 @@ const GPSTracking = () => {
                   }}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
+                  {t('tracking.refresh')}
                 </Button>
                 <Button className="flex-1">
                   <MapPin className="h-4 w-4 mr-2" />
-                  Share Location
+                  {t('tracking.shareLocation')}
                 </Button>
               </div>
             </div>
