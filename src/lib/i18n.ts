@@ -163,7 +163,10 @@ const resources = {
         twoFactorDesc: 'Add an extra layer of security to your account',
         loginAlerts: 'Login Alerts',
         loginAlertsDesc: 'Get notified of new logins to your account',
-        changePassword: 'Change Password'
+        changePassword: 'Change Password',
+        lightMode: 'Light',
+        darkMode: 'Dark',
+        systemDefault: 'System'
       },
       tracking: {
         title: 'Live Tracking',
@@ -178,7 +181,14 @@ const resources = {
         shareLocation: 'Share Location',
         inTransit: 'In Transit',
         name: 'Name',
-        type: 'Type'
+        type: 'Type',
+        liveTracking: 'Live Tracking',
+        routeHistory: 'Route History',
+        playback: 'Playback',
+        lastUpdated: 'Last Updated',
+        covered: 'covered',
+        remaining: 'remaining',
+        speed: 'Speed'
       },
       wallet: {
         title: 'My Wallet',
@@ -380,7 +390,10 @@ const resources = {
         twoFactorDesc: 'अपने खाते में सुरक्षा की एक अतिरिक्त परत जोड़ें',
         loginAlerts: 'लॉगिन अलर्ट',
         loginAlertsDesc: 'अपने खाते में नए लॉगिन की सूचना प्राप्त करें',
-        changePassword: 'पासवर्ड बदलें'
+        changePassword: 'पासवर्ड बदलें',
+        lightMode: 'लाइट',
+        darkMode: 'डार्क',
+        systemDefault: 'सिस्टम'
       },
       tracking: {
         title: 'लाइव ट्रैकिंग',
@@ -395,7 +408,14 @@ const resources = {
         shareLocation: 'स्थान साझा करें',
         inTransit: 'रास्ते में',
         name: 'नाम',
-        type: 'प्रकार'
+        type: 'प्रकार',
+        liveTracking: 'लाइव ट्रैकिंग',
+        routeHistory: 'रूट इतिहास',
+        playback: 'प्लेबैक',
+        lastUpdated: 'अंतिम अपडेट',
+        covered: 'कवर',
+        remaining: 'शेष',
+        speed: 'गति'
       },
       wallet: {
         title: 'मेरा वॉलेट',
@@ -597,7 +617,10 @@ const resources = {
         twoFactorDesc: 'तुमच्या खात्यात सुरक्षिततेचा अतिरिक्त स्तर जोडा',
         loginAlerts: 'लॉगिन अलर्ट्स',
         loginAlertsDesc: 'तुमच्या खात्यात नवीन लॉगिनची सूचना मिळवा',
-        changePassword: 'पासवर्ड बदला'
+        changePassword: 'पासवर्ड बदला',
+        lightMode: 'लाइट',
+        darkMode: 'डार्क',
+        systemDefault: 'सिस्टम'
       },
       tracking: {
         title: 'लाइव्ह ट्रॅकिंग',
@@ -612,7 +635,14 @@ const resources = {
         shareLocation: 'स्थान शेअर करा',
         inTransit: 'प्रवासात',
         name: 'नाव',
-        type: 'प्रकार'
+        type: 'प्रकार',
+        liveTracking: 'लाइव्ह ट्रॅकिंग',
+        routeHistory: 'रूट इतिहास',
+        playback: 'प्लेबॅक',
+        lastUpdated: 'शेवटचे अपडेट',
+        covered: 'कव्हर',
+        remaining: 'उर्वरित',
+        speed: 'वेग'
       },
       wallet: {
         title: 'माझे वॉलेट',
@@ -652,7 +682,7 @@ const resources = {
         matchScore: 'मॅच स्कोअर'
       }
     }
-  },
+  }
 };
 
 i18n.use(initReactI18next).init({

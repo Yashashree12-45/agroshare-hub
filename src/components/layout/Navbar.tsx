@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, ChevronDown, Globe, Tractor, User, LogOut, Sparkles } from 'lucide-react';
+import { Menu, X, ChevronDown, Globe, Tractor, User, LogOut, Sparkles, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/authStore';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,7 @@ export function Navbar() {
     { href: '/dashboard', label: t('nav.dashboard') },
     { href: '/ai-recommend', label: t('nav.aiRecommend'), icon: Sparkles },
     { href: '/tracking', label: t('nav.tracking') },
+    { href: '/wallet', label: t('nav.wallet'), icon: Wallet },
     { href: '/pricing', label: t('nav.pricing') },
   ];
 
@@ -86,6 +88,9 @@ export function Navbar() {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            
             {/* Language Switcher */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
