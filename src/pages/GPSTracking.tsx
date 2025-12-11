@@ -125,50 +125,55 @@ const GPSTracking = () => {
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     
-    const L = require('leaflet');
-    const map = mapRef.current;
-    
-    // Clear existing layers except tile layer
-    map.eachLayer((layer: any) => {
-      if (layer instanceof L.Polyline || layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
+    const updateMap = async () => {
+      const L = await import('leaflet');
+      const map = mapRef.current;
+      if (!map) return;
+      
+      // Clear existing layers except tile layer
+      map.eachLayer((layer: any) => {
+        if (layer instanceof L.Polyline || layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+      });
 
-    const tractorIcon = new L.Icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/2138/2138440.png',
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40],
-    });
+      const tractorIcon = new L.Icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/2138/2138440.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40],
+      });
 
-    const destinationIcon = new L.Icon({
-      iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-      iconSize: [35, 35],
-      iconAnchor: [17, 35],
-      popupAnchor: [0, -35],
-    });
+      const destinationIcon = new L.Icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+        iconSize: [35, 35],
+        iconAnchor: [17, 35],
+        popupAnchor: [0, -35],
+      });
 
-    // Add traveled path
-    L.polyline(routePoints.slice(0, currentPointIndex + 1), {
-      color: '#2E7D32',
-      weight: 4,
-      opacity: 0.8
-    }).addTo(map);
+      // Add traveled path
+      L.polyline(routePoints.slice(0, currentPointIndex + 1), {
+        color: '#2E7D32',
+        weight: 4,
+        opacity: 0.8
+      }).addTo(map);
 
-    // Add remaining path
-    L.polyline(routePoints.slice(currentPointIndex), {
-      color: '#9CA3AF',
-      weight: 3,
-      dashArray: '10, 10',
-      opacity: 0.5
-    }).addTo(map);
+      // Add remaining path
+      L.polyline(routePoints.slice(currentPointIndex), {
+        color: '#9CA3AF',
+        weight: 3,
+        dashArray: '10, 10',
+        opacity: 0.5
+      }).addTo(map);
 
-    // Add markers
-    L.marker(currentPosition, { icon: tractorIcon }).addTo(map);
-    L.marker(routePoints[routePoints.length - 1], { icon: destinationIcon }).addTo(map);
+      // Add markers
+      L.marker(currentPosition, { icon: tractorIcon }).addTo(map);
+      L.marker(routePoints[routePoints.length - 1], { icon: destinationIcon }).addTo(map);
 
-    map.setView(currentPosition, 14);
+      map.setView(currentPosition, 14);
+    };
+
+    updateMap();
   }, [currentPointIndex, mapLoaded]);
 
   // Simulate movement
