@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Clock, UserCheck, Check, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, UserCheck, Check, Loader2, Truck, Package } from 'lucide-react';
 import { Equipment } from '@/services/api';
 import { useBookingStore } from '@/store/bookingStore';
 import { useAuthStore } from '@/store/authStore';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Dialog,
   DialogContent,
@@ -36,13 +37,6 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-const timeSlots = [
-  { value: '2', label: '2 Hours' },
-  { value: '4', label: '4 Hours' },
-  { value: '8', label: 'Full Day (8 Hours)' },
-  { value: 'custom', label: 'Custom' },
-];
-
 export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -52,6 +46,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [duration, setDuration] = useState('4');
   const [withOperator, setWithOperator] = useState(false);
+  const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('delivery');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'select' | 'confirm' | 'success'>('select');
 
@@ -59,13 +54,22 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const hours = duration === 'custom' ? 4 : parseInt(duration);
   const baseCost = hours * equipment.pricePerHour;
   const totalOperatorCost = withOperator ? operatorCost * hours : 0;
-  const totalCost = baseCost + totalOperatorCost + equipment.transportCharge;
+  const deliveryCost = !withOperator && deliveryOption === 'delivery' ? equipment.transportCharge : 0;
+  const pickupDiscount = !withOperator && deliveryOption === 'pickup' ? Math.floor(equipment.transportCharge * 0.5) : 0;
+  const totalCost = baseCost + totalOperatorCost + (withOperator ? equipment.transportCharge : deliveryCost) - pickupDiscount;
+
+  const timeSlots = [
+    { value: '2', label: `2 ${t('booking.hours')}` },
+    { value: '4', label: `4 ${t('booking.hours')}` },
+    { value: '8', label: `${t('booking.fullDay')} (8 ${t('booking.hours')})` },
+    { value: 'custom', label: t('booking.custom') },
+  ];
 
   const handleBooking = async () => {
     if (!isAuthenticated) {
       toast({
-        title: 'Login Required',
-        description: 'Please login to book equipment',
+        title: t('booking.loginRequired'),
+        description: t('booking.loginRequiredDesc'),
         variant: 'destructive',
       });
       navigate('/login');
@@ -74,8 +78,8 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
 
     if (!date) {
       toast({
-        title: 'Select Date',
-        description: 'Please select a booking date',
+        title: t('booking.selectDateTitle'),
+        description: t('booking.selectDateDesc'),
         variant: 'destructive',
       });
       return;
@@ -210,7 +214,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
                   <div>
                     <div className="font-medium">{t('booking.withOperator')}</div>
                     <div className="text-sm text-muted-foreground">
-                      +₹{operatorCost}/hour
+                      +₹{operatorCost}{t('common.perHour')}
                     </div>
                   </div>
                 </div>
@@ -221,22 +225,80 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
               </div>
             )}
 
+            {/* Delivery Option - Only show when WITHOUT operator */}
+            {!withOperator && (
+              <div className="p-4 bg-muted/50 rounded-xl space-y-3">
+                <Label className="font-medium">{t('booking.deliveryOption')}</Label>
+                <RadioGroup
+                  value={deliveryOption}
+                  onValueChange={(value) => setDeliveryOption(value as 'pickup' | 'delivery')}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <RadioGroupItem value="delivery" id="delivery" />
+                    <Label htmlFor="delivery" className="flex-1 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <Truck className="w-4 h-4 text-primary" />
+                        <div>
+                          <div className="font-medium">{t('booking.ownerDelivery')}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t('booking.ownerDeliveryDesc')} (+₹{equipment.transportCharge})
+                          </div>
+                        </div>
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <RadioGroupItem value="pickup" id="pickup" />
+                    <Label htmlFor="pickup" className="flex-1 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <Package className="w-4 h-4 text-secondary" />
+                        <div>
+                          <div className="font-medium">{t('booking.selfPickup')}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t('booking.selfPickupDesc')} (-₹{Math.floor(equipment.transportCharge * 0.5)} {t('booking.discount')})
+                          </div>
+                        </div>
+                      </div>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
+
             {/* Price Breakdown */}
             <div className="border-t border-border pt-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Base ({hours} hours)</span>
+                <span className="text-muted-foreground">{t('booking.base')} ({hours} {t('booking.hours')})</span>
                 <span>₹{baseCost}</span>
               </div>
               {withOperator && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Operator</span>
+                  <span className="text-muted-foreground">{t('booking.operatorCost')}</span>
                   <span>₹{totalOperatorCost}</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Transport</span>
-                <span>₹{equipment.transportCharge}</span>
-              </div>
+              {withOperator ? (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{t('booking.transport')}</span>
+                  <span>₹{equipment.transportCharge}</span>
+                </div>
+              ) : (
+                <>
+                  {deliveryOption === 'delivery' && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{t('booking.deliveryCharge')}</span>
+                      <span>₹{deliveryCost}</span>
+                    </div>
+                  )}
+                  {deliveryOption === 'pickup' && pickupDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-secondary">
+                      <span>{t('booking.pickupDiscount')}</span>
+                      <span>-₹{pickupDiscount}</span>
+                    </div>
+                  )}
+                </>
+              )}
               <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
                 <span>{t('booking.totalCost')}</span>
                 <span className="text-primary">₹{totalCost}</span>
@@ -246,7 +308,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
             {/* Actions */}
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={handleClose}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 className="flex-1"
