@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Clock, UserCheck, Check, Loader2, Truck, Package } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, UserCheck, Check, Loader2, Truck, Package, MapPin } from 'lucide-react';
 import { Equipment } from '@/services/api';
 import { useBookingStore } from '@/store/bookingStore';
 import { useAuthStore } from '@/store/authStore';
@@ -29,6 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 
 interface BookingModalProps {
@@ -47,8 +48,25 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const [duration, setDuration] = useState('4');
   const [withOperator, setWithOperator] = useState(false);
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('delivery');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'select' | 'confirm' | 'success'>('select');
+
+  // Calculate estimated delivery time based on simulated distance
+  const estimatedDelivery = useMemo(() => {
+    if (!deliveryAddress || deliveryOption !== 'delivery') return null;
+    
+    // Simulate distance calculation based on address length (mock)
+    const simulatedDistance = Math.min(5 + (deliveryAddress.length % 20) * 2, 50); // 5-50 km
+    const estimatedMinutes = Math.round(simulatedDistance * 2.5); // ~2.5 min per km
+    
+    return {
+      distance: simulatedDistance,
+      time: estimatedMinutes < 60 
+        ? `${estimatedMinutes} ${t('booking.minutes')}`
+        : `${Math.floor(estimatedMinutes / 60)} ${t('booking.hrs')} ${estimatedMinutes % 60} ${t('booking.minutes')}`
+    };
+  }, [deliveryAddress, deliveryOption, t]);
 
   const operatorCost = 500;
   const hours = duration === 'custom' ? 4 : parseInt(duration);
@@ -114,6 +132,8 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
     setDate(undefined);
     setDuration('4');
     setWithOperator(false);
+    setDeliveryAddress('');
+    setDeliveryOption('delivery');
     onClose();
   };
 
@@ -263,6 +283,35 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
                     </Label>
                   </div>
                 </RadioGroup>
+
+                {/* Delivery Address Input - Only show when delivery is selected */}
+                {deliveryOption === 'delivery' && (
+                  <div className="mt-4 space-y-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      {t('booking.deliveryAddress')}
+                    </Label>
+                    <Input
+                      placeholder={t('booking.enterAddress')}
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      className="w-full"
+                    />
+                    
+                    {/* Estimated Delivery Time */}
+                    {estimatedDelivery && (
+                      <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                        <Clock className="w-4 h-4 text-primary" />
+                        <div className="text-sm">
+                          <span className="font-medium text-primary">{t('booking.estimatedDelivery')}: </span>
+                          <span className="text-foreground">
+                            {estimatedDelivery.time} ({estimatedDelivery.distance} km)
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

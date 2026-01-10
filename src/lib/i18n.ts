@@ -132,7 +132,12 @@ const resources = {
         selfPickupDesc: 'You pick up from owner location',
         discount: 'discount',
         deliveryCharge: 'Delivery Charge',
-        pickupDiscount: 'Pickup Discount'
+        pickupDiscount: 'Pickup Discount',
+        deliveryAddress: 'Delivery Address',
+        enterAddress: 'Enter your village, landmark, district...',
+        estimatedDelivery: 'Est. Delivery Time',
+        minutes: 'min',
+        hrs: 'hr'
       },
       dashboard: {
         welcome: 'Welcome back',
@@ -432,7 +437,12 @@ const resources = {
         selfPickupDesc: 'आप मालिक के स्थान से उठाएं',
         discount: 'छूट',
         deliveryCharge: 'डिलीवरी शुल्क',
-        pickupDiscount: 'पिकअप छूट'
+        pickupDiscount: 'पिकअप छूट',
+        deliveryAddress: 'डिलीवरी पता',
+        enterAddress: 'अपना गांव, लैंडमार्क, जिला दर्ज करें...',
+        estimatedDelivery: 'अनुमानित डिलीवरी समय',
+        minutes: 'मिनट',
+        hrs: 'घंटा'
       },
       dashboard: {
         welcome: 'वापसी पर स्वागत है',
@@ -732,7 +742,12 @@ const resources = {
         selfPickupDesc: 'तुम्ही मालकाच्या स्थानावरून उचलाल',
         discount: 'सूट',
         deliveryCharge: 'डिलिव्हरी शुल्क',
-        pickupDiscount: 'पिकअप सूट'
+        pickupDiscount: 'पिकअप सूट',
+        deliveryAddress: 'डिलिव्हरी पत्ता',
+        enterAddress: 'तुमचे गाव, लँडमार्क, जिल्हा टाका...',
+        estimatedDelivery: 'अंदाजित डिलिव्हरी वेळ',
+        minutes: 'मिनिटे',
+        hrs: 'तास'
       },
       dashboard: {
         welcome: 'पुन्हा स्वागत',
