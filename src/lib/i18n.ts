@@ -137,7 +137,55 @@ const resources = {
         enterAddress: 'Enter your village, landmark, district...',
         estimatedDelivery: 'Est. Delivery Time',
         minutes: 'min',
-        hrs: 'hr'
+        hrs: 'hr',
+        pickDate: 'Pick a date',
+        pickupLocation: 'Pickup Location'
+      },
+      maps: {
+        useCurrentLocation: 'Use current location',
+        distance: 'Distance',
+        travelTime: 'Travel Time',
+        getDirections: 'Get Directions'
+      },
+      notifications: {
+        trackingTitle: 'Delivery Tracking',
+        trackDelivery: 'Track Delivery',
+        confirmed: 'Confirmed',
+        preparing: 'Preparing',
+        dispatched: 'Dispatched',
+        inTransit: 'In Transit',
+        arriving: 'Arriving',
+        delivered: 'Delivered',
+        bookingConfirmed: 'Your booking has been confirmed!',
+        equipmentPreparing: 'Equipment is being prepared for delivery',
+        equipmentDispatched: 'Equipment has been dispatched',
+        equipmentOnWay: 'Equipment is on its way to you',
+        equipmentArriving: 'Equipment will arrive in 5 minutes',
+        equipmentDelivered: 'Equipment has been delivered',
+        eta: 'ETA',
+        distance: 'Distance',
+        driver: 'Driver',
+        recentUpdates: 'Recent Updates'
+      },
+      showcase: {
+        title: 'Featured Equipment',
+        subtitle: 'Top-rated equipment available for rent near you',
+        viewAll: 'View All Equipment'
+      },
+      trust: {
+        trustedBy: 'Trusted by farmers across India',
+        verified: 'Verified Owners',
+        secure: 'Secure Payments',
+        fast: 'Fast Booking',
+        certified: 'Certified Equipment',
+        protected: 'Insurance Protected',
+        support: '24/7 Support'
+      },
+      stats: {
+        bookingsToday: 'Bookings Today',
+        rating: 'Average Rating',
+        uptime: 'Platform Uptime',
+        growth: 'Monthly Growth'
       },
       dashboard: {
         welcome: 'Welcome back',
