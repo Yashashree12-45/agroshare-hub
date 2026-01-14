@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import FarmerDashboard from "./pages/FarmerDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import OperatorDashboard from "./pages/OperatorDashboard";
+import BookingHistory from "./pages/BookingHistory";
 import GPSTracking from "./pages/GPSTracking";
 import AIRecommendation from "./pages/AIRecommendation";
 import Wallet from "./pages/Wallet";
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<FarmerDashboard />} />
             <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+            <Route path="/operator-dashboard" element={<OperatorDashboard />} />
+            <Route path="/bookings" element={<BookingHistory />} />
             <Route path="/tracking" element={<GPSTracking />} />
             <Route path="/ai-recommend" element={<AIRecommendation />} />
             <Route path="/wallet" element={<Wallet />} />
