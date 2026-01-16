@@ -139,7 +139,12 @@ const resources = {
         minutes: 'min',
         hrs: 'hr',
         pickDate: 'Pick a date',
-        pickupLocation: 'Pickup Location'
+        pickupLocation: 'Pickup Location',
+        operatorIncluded: 'Operator service included',
+        addOperatorDesc: 'Add a skilled operator for your equipment',
+        selfOperateDesc: 'You will operate the equipment yourself. Make sure you have the required skills and license.',
+        operatorDelivery: 'Operator Will Deliver',
+        operatorDeliveryDesc: 'The operator will bring the equipment directly to your field and operate it for you.'
       },
       maps: {
         useCurrentLocation: 'Use current location',
@@ -490,7 +495,14 @@ const resources = {
         enterAddress: 'अपना गांव, लैंडमार्क, जिला दर्ज करें...',
         estimatedDelivery: 'अनुमानित डिलीवरी समय',
         minutes: 'मिनट',
-        hrs: 'घंटा'
+        hrs: 'घंटा',
+        pickDate: 'तारीख चुनें',
+        pickupLocation: 'पिकअप स्थान',
+        operatorIncluded: 'ऑपरेटर सेवा शामिल',
+        addOperatorDesc: 'अपने उपकरण के लिए कुशल ऑपरेटर जोड़ें',
+        selfOperateDesc: 'आप उपकरण स्वयं संचालित करेंगे। सुनिश्चित करें कि आपके पास आवश्यक कौशल और लाइसेंस है।',
+        operatorDelivery: 'ऑपरेटर डिलीवर करेगा',
+        operatorDeliveryDesc: 'ऑपरेटर उपकरण सीधे आपके खेत में लाएगा और आपके लिए संचालित करेगा।'
       },
       dashboard: {
         welcome: 'वापसी पर स्वागत है',
@@ -795,7 +807,14 @@ const resources = {
         enterAddress: 'तुमचे गाव, लँडमार्क, जिल्हा टाका...',
         estimatedDelivery: 'अंदाजित डिलिव्हरी वेळ',
         minutes: 'मिनिटे',
-        hrs: 'तास'
+        hrs: 'तास',
+        pickDate: 'तारीख निवडा',
+        pickupLocation: 'पिकअप स्थान',
+        operatorIncluded: 'ऑपरेटर सेवा समाविष्ट',
+        addOperatorDesc: 'तुमच्या उपकरणासाठी कुशल ऑपरेटर जोडा',
+        selfOperateDesc: 'तुम्ही उपकरण स्वतः चालवाल. तुमच्याकडे आवश्यक कौशल्य आणि परवाना असल्याची खात्री करा.',
+        operatorDelivery: 'ऑपरेटर डिलिव्हर करेल',
+        operatorDeliveryDesc: 'ऑपरेटर उपकरण थेट तुमच्या शेतात आणेल आणि तुमच्यासाठी चालवेल.'
       },
       dashboard: {
         welcome: 'पुन्हा स्वागत',
