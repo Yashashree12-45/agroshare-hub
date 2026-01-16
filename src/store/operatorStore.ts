@@ -15,13 +15,19 @@ export interface Operator {
   hourlyRate: number;
   available: boolean;
   verified: boolean;
+  bio?: string;
+  languages?: string[];
+  certifications?: string[];
 }
 
 interface OperatorState {
   operators: Operator[];
   addOperator: (operator: Operator) => void;
   updateOperator: (id: string, updates: Partial<Operator>) => void;
+  removeOperator: (id: string) => void;
   getAvailableOperators: () => Operator[];
+  getOperatorsBySpecialization: (equipmentType: string) => Operator[];
+  setOperatorAvailability: (id: string, available: boolean) => void;
 }
 
 const mockOperators: Operator[] = [
@@ -38,7 +44,10 @@ const mockOperators: Operator[] = [
     location: 'Pune, Maharashtra',
     hourlyRate: 500,
     available: true,
-    verified: true
+    verified: true,
+    bio: 'Experienced tractor operator with 8+ years in agriculture.',
+    languages: ['Hindi', 'Marathi', 'English'],
+    certifications: ['Heavy Vehicle License', 'Agricultural Equipment Certification']
   },
   {
     id: 'op2',
@@ -53,7 +62,10 @@ const mockOperators: Operator[] = [
     location: 'Nashik, Maharashtra',
     hourlyRate: 600,
     available: true,
-    verified: true
+    verified: true,
+    bio: 'Certified drone pilot specializing in crop spraying and monitoring.',
+    languages: ['Hindi', 'Marathi'],
+    certifications: ['Drone Pilot License', 'Pesticide Application Certificate']
   },
   {
     id: 'op3',
@@ -64,11 +76,14 @@ const mockOperators: Operator[] = [
     experience: 12,
     rating: 4.9,
     completedJobs: 245,
-    specializations: ['Tractor', 'Harvester', 'Water Pump'],
+    specializations: ['Tractor', 'Harvester', 'Water Pump', 'Combine'],
     location: 'Kolhapur, Maharashtra',
     hourlyRate: 550,
     available: true,
-    verified: true
+    verified: true,
+    bio: 'Senior agricultural equipment operator with expertise in harvesting.',
+    languages: ['Hindi', 'Marathi', 'Kannada'],
+    certifications: ['Master Operator Certificate', 'Safety Training']
   }
 ];
 
@@ -91,8 +106,31 @@ export const useOperatorStore = create<OperatorState>()(
         }));
       },
 
+      removeOperator: (id) => {
+        set((state) => ({
+          operators: state.operators.filter((op) => op.id !== id)
+        }));
+      },
+
       getAvailableOperators: () => {
         return get().operators.filter((op) => op.available);
+      },
+
+      getOperatorsBySpecialization: (equipmentType: string) => {
+        return get().operators.filter(
+          op => op.available && op.specializations.some(s => 
+            equipmentType.toLowerCase().includes(s.toLowerCase()) ||
+            s.toLowerCase().includes(equipmentType.toLowerCase().split(' ')[0])
+          )
+        );
+      },
+
+      setOperatorAvailability: (id, available) => {
+        set((state) => ({
+          operators: state.operators.map((op) =>
+            op.id === id ? { ...op, available } : op
+          )
+        }));
       }
     }),
     {

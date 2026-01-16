@@ -46,6 +46,8 @@ const RegisterPage = () => {
   const [location, setLocation] = useState('');
   const [experience, setExperience] = useState('');
   const [specializations, setSpecializations] = useState('');
+  const [hourlyRate, setHourlyRate] = useState('500');
+  const [bio, setBio] = useState('');
   const [role, setRole] = useState<UserRole>(
     (searchParams.get('role') as UserRole) || 'farmer'
   );
@@ -93,11 +95,14 @@ const RegisterPage = () => {
           experience: parseInt(experience) || 0,
           rating: 0,
           completedJobs: 0,
-          specializations: specializations.split(',').map(s => s.trim()),
+          specializations: specializations.split(',').map(s => s.trim()).filter(s => s),
           location,
-          hourlyRate: 500,
+          hourlyRate: parseInt(hourlyRate) || 500,
           available: true,
-          verified: false
+          verified: false,
+          bio,
+          languages: ['Hindi', 'Marathi'],
+          certifications: []
         });
       }
 
@@ -267,6 +272,33 @@ const RegisterPage = () => {
                     placeholder={t('register.specializationsPlaceholder')}
                     value={specializations}
                     onChange={(e) => setSpecializations(e.target.value)}
+                    className="rounded-xl resize-none"
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="hourlyRate">{t('register.hourlyRate')}</Label>
+                  <div className="relative mt-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
+                    <Input
+                      id="hourlyRate"
+                      type="number"
+                      placeholder="500"
+                      value={hourlyRate}
+                      onChange={(e) => setHourlyRate(e.target.value)}
+                      className="pl-8 h-11 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="bio">{t('register.bio')}</Label>
+                  <Textarea
+                    id="bio"
+                    placeholder={t('register.bioPlaceholder')}
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
                     className="rounded-xl resize-none"
                     rows={2}
                   />
