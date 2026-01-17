@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Tractor, Calendar, DollarSign, TrendingUp, CheckCircle, XCircle, 
-  Clock, Plus, Edit, Eye, Star, MapPin, Settings, Bell
+  Clock, Plus, Edit, Eye, Star, MapPin, Bell, Package, Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,18 +112,6 @@ const mockBookingRequests: BookingRequest[] = [
     status: 'pending',
     withOperator: false,
   },
-  {
-    id: 'REQ-003',
-    equipmentId: '1',
-    equipmentName: 'John Deere 5310',
-    farmerName: 'Ravi Kumar',
-    farmerPhone: '+91 76543 21098',
-    date: '2024-01-18',
-    duration: '4 hours',
-    totalAmount: 3200,
-    status: 'accepted',
-    withOperator: true,
-  },
 ];
 
 const mockEarnings = {
@@ -134,9 +122,9 @@ const mockEarnings = {
 };
 
 const statusConfig = {
-  available: { label: 'Available', variant: 'default' as const, color: 'text-green-600' },
-  booked: { label: 'Booked', variant: 'secondary' as const, color: 'text-blue-600' },
-  maintenance: { label: 'Maintenance', variant: 'outline' as const, color: 'text-orange-600' },
+  available: { label: 'Available', color: 'bg-green-500/10 text-green-600 border-green-500/20' },
+  booked: { label: 'Booked', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
+  maintenance: { label: 'Maintenance', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
 };
 
 const OwnerDashboard = () => {
@@ -150,6 +138,7 @@ const OwnerDashboard = () => {
   const pendingRequests = bookingRequests.filter((r) => r.status === 'pending');
   const totalEquipment = equipment.length;
   const availableEquipment = equipment.filter((e) => e.status === 'available').length;
+  const totalEarnings = equipment.reduce((acc, e) => acc + e.totalEarnings, 0);
 
   const handleBookingAction = (request: BookingRequest, action: 'accept' | 'reject') => {
     setSelectedRequest(request);
@@ -170,8 +159,8 @@ const OwnerDashboard = () => {
     
     toast.success(
       dialogAction === 'accept' 
-        ? 'Booking request accepted!' 
-        : 'Booking request rejected'
+        ? 'Booking accepted! The farmer will be notified.' 
+        : 'Booking declined.'
     );
     setShowDialog(false);
   };
@@ -183,27 +172,31 @@ const OwnerDashboard = () => {
       subtitle: `${availableEquipment} available`,
       icon: Tractor,
       color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Pending Requests',
       value: pendingRequests.length,
-      subtitle: 'Awaiting response',
+      subtitle: 'Needs attention',
       icon: Clock,
-      color: 'text-accent',
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-500/10',
     },
     {
       title: 'This Month',
       value: `₹${mockEarnings.thisMonth.toLocaleString()}`,
-      subtitle: `+${mockEarnings.growth}% from last month`,
-      icon: DollarSign,
+      subtitle: `+${mockEarnings.growth}%`,
+      icon: TrendingUp,
       color: 'text-green-600',
+      bgColor: 'bg-green-500/10',
     },
     {
-      title: 'Pending Payout',
-      value: `₹${mockEarnings.pending.toLocaleString()}`,
-      subtitle: 'Processing',
-      icon: TrendingUp,
-      color: 'text-blue-600',
+      title: 'Total Earnings',
+      value: `₹${(totalEarnings / 1000).toFixed(0)}K`,
+      subtitle: 'All time',
+      icon: DollarSign,
+      color: 'text-secondary',
+      bgColor: 'bg-secondary/10',
     },
   ];
 
@@ -211,26 +204,28 @@ const OwnerDashboard = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-6 pt-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Owner Dashboard</h1>
-              <p className="text-muted-foreground">Manage your equipment and bookings</p>
+              <h1 className="text-2xl font-bold">Owner Dashboard</h1>
+              <p className="text-muted-foreground text-sm">Manage your equipment and bookings</p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="relative">
                 <Bell className="h-4 w-4" />
+                {pendingRequests.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+                    {pendingRequests.length}
+                  </span>
+                )}
               </Button>
-              <Button variant="outline" size="icon">
-                <Settings className="h-4 w-4" />
-              </Button>
-              <Button>
+              <Button onClick={() => navigate('/list-equipment')}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Equipment
               </Button>
@@ -238,24 +233,24 @@ const OwnerDashboard = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {stats.map((stat, idx) => (
               <motion.div
                 key={stat.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: idx * 0.05 }}
               >
-                <Card>
-                  <CardContent className="pt-6">
+                <Card className="border-border/50">
+                  <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">{stat.title}</p>
-                        <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
+                        <p className="text-xs text-muted-foreground">{stat.title}</p>
+                        <p className="text-xl font-bold mt-0.5">{stat.value}</p>
+                        <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
                       </div>
-                      <div className={`p-2 rounded-lg bg-muted ${stat.color}`}>
-                        <stat.icon className="h-5 w-5" />
+                      <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                        <stat.icon className={`h-4 w-4 ${stat.color}`} />
                       </div>
                     </div>
                   </CardContent>
@@ -266,31 +261,38 @@ const OwnerDashboard = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="equipment" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="equipment">My Equipment</TabsTrigger>
-              <TabsTrigger value="requests">
-                Booking Requests
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="equipment" className="gap-1.5">
+                <Package className="w-4 h-4" />
+                <span className="hidden sm:inline">Equipment</span>
+              </TabsTrigger>
+              <TabsTrigger value="requests" className="gap-1.5 relative">
+                <Users className="w-4 h-4" />
+                <span className="hidden sm:inline">Requests</span>
                 {pendingRequests.length > 0 && (
-                  <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 text-xs">
+                  <span className="ml-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
                     {pendingRequests.length}
-                  </Badge>
+                  </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="earnings">Earnings</TabsTrigger>
+              <TabsTrigger value="earnings" className="gap-1.5">
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Earnings</span>
+              </TabsTrigger>
             </TabsList>
 
             {/* Equipment Tab */}
             <TabsContent value="equipment" className="space-y-4">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {equipment.map((item) => (
                   <motion.div
                     key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ y: -4 }}
+                    whileHover={{ y: -2 }}
                   >
                     <Card className="overflow-hidden">
-                      <div className="relative h-40">
+                      <div className="relative h-36">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -298,30 +300,30 @@ const OwnerDashboard = () => {
                         />
                         <Badge
                           className={`absolute top-2 right-2 ${statusConfig[item.status].color}`}
-                          variant={statusConfig[item.status].variant}
+                          variant="outline"
                         >
                           {statusConfig[item.status].label}
                         </Badge>
                       </div>
-                      <CardContent className="pt-4 space-y-3">
+                      <CardContent className="p-4 space-y-3">
                         <div>
-                          <h3 className="font-semibold text-foreground">{item.name}</h3>
+                          <h3 className="font-semibold">{item.name}</h3>
                           <p className="text-sm text-muted-foreground flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
                             {item.location}
                           </p>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">₹{item.pricePerHour}/hr</span>
+                          <span className="font-medium text-primary">₹{item.pricePerHour}/hr</span>
                           <span className="flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-accent text-accent" />
+                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                             {item.rating}
                           </span>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="bg-muted rounded-lg p-2 text-center">
                             <p className="font-semibold">₹{(item.totalEarnings / 1000).toFixed(0)}K</p>
-                            <p className="text-xs text-muted-foreground">Earnings</p>
+                            <p className="text-xs text-muted-foreground">Earned</p>
                           </div>
                           <div className="bg-muted rounded-lg p-2 text-center">
                             <p className="font-semibold">{item.totalBookings}</p>
@@ -342,101 +344,116 @@ const OwnerDashboard = () => {
                     </Card>
                   </motion.div>
                 ))}
+
+                {/* Add Equipment Card */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ y: -2 }}
+                >
+                  <Card 
+                    className="h-full min-h-[300px] border-dashed flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() => navigate('/list-equipment')}
+                  >
+                    <CardContent className="text-center">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                        <Plus className="w-8 h-8 text-primary" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Add Equipment</h3>
+                      <p className="text-sm text-muted-foreground">List new equipment for rental</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </div>
             </TabsContent>
 
             {/* Booking Requests Tab */}
-            <TabsContent value="requests" className="space-y-4">
+            <TabsContent value="requests" className="space-y-3">
               {bookingRequests.length === 0 ? (
                 <Card className="p-8 text-center">
                   <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">No booking requests yet</p>
                 </Card>
               ) : (
-                <div className="space-y-3">
-                  {bookingRequests.map((request) => (
-                    <motion.div
-                      key={request.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                    >
-                      <Card className={request.status === 'pending' ? 'border-accent' : ''}>
-                        <CardContent className="pt-4">
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-semibold">{request.equipmentName}</h4>
-                                <Badge
-                                  variant={
-                                    request.status === 'pending'
-                                      ? 'secondary'
-                                      : request.status === 'accepted'
-                                      ? 'default'
-                                      : 'destructive'
-                                  }
-                                >
-                                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                {request.farmerName} • {request.farmerPhone}
-                              </p>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" />
-                                  {request.date}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {request.duration}
-                                </span>
-                                {request.withOperator && (
-                                  <Badge variant="outline" className="text-xs">
-                                    With Operator
-                                  </Badge>
-                                )}
-                              </div>
+                bookingRequests.map((request) => (
+                  <motion.div
+                    key={request.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    <Card className={request.status === 'pending' ? 'border-primary/50' : ''}>
+                      <CardContent className="p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-semibold">{request.equipmentName}</h4>
+                              <Badge
+                                variant={
+                                  request.status === 'pending'
+                                    ? 'secondary'
+                                    : request.status === 'accepted'
+                                    ? 'default'
+                                    : 'destructive'
+                                }
+                              >
+                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              </Badge>
                             </div>
-                            <div className="flex items-center gap-4">
-                              <div className="text-right">
-                                <p className="text-lg font-bold text-primary">
-                                  ₹{request.totalAmount.toLocaleString()}
-                                </p>
-                              </div>
-                              {request.status === 'pending' && (
-                                <div className="flex gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleBookingAction(request, 'reject')}
-                                  >
-                                    <XCircle className="h-4 w-4 mr-1" />
-                                    Reject
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleBookingAction(request, 'accept')}
-                                  >
-                                    <CheckCircle className="h-4 w-4 mr-1" />
-                                    Accept
-                                  </Button>
-                                </div>
+                            <p className="text-sm text-muted-foreground">
+                              {request.farmerName} • {request.farmerPhone}
+                            </p>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {request.date}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {request.duration}
+                              </span>
+                              {request.withOperator && (
+                                <Badge variant="outline" className="text-xs py-0">
+                                  With Operator
+                                </Badge>
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
+                          <div className="flex items-center gap-3">
+                            <p className="text-lg font-bold text-primary">
+                              ₹{request.totalAmount.toLocaleString()}
+                            </p>
+                            {request.status === 'pending' && (
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleBookingAction(request, 'reject')}
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleBookingAction(request, 'accept')}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Accept
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))
               )}
             </TabsContent>
 
             {/* Earnings Tab */}
             <TabsContent value="earnings" className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="pb-2">
                     <CardTitle className="text-base">Monthly Earnings</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -454,67 +471,85 @@ const OwnerDashboard = () => {
                       </div>
                       <Progress value={60} className="h-2" />
                     </div>
-                    <div className="pt-2 border-t">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Growth</span>
-                        <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          +{mockEarnings.growth}%
-                        </Badge>
-                      </div>
+                    <div className="pt-2 border-t flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Growth</span>
+                      <span className="text-green-600 font-semibold flex items-center gap-1">
+                        <TrendingUp className="w-4 h-4" />
+                        +{mockEarnings.growth}%
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Equipment Performance</CardTitle>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Pending Payout</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    {equipment.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="h-8 w-8 rounded object-cover"
-                          />
-                          <span className="text-sm font-medium">{item.name}</span>
-                        </div>
-                        <span className="text-sm font-semibold">
-                          ₹{item.totalEarnings.toLocaleString()}
-                        </span>
-                      </div>
-                    ))}
+                  <CardContent>
+                    <div className="text-3xl font-bold text-primary mb-4">
+                      ₹{mockEarnings.pending.toLocaleString()}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Your earnings will be transferred to your bank account within 2-3 business days.
+                    </p>
+                    <Button className="w-full">Request Payout</Button>
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Equipment Performance */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Equipment Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {equipment.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover" />
+                          <div>
+                            <p className="font-medium text-sm">{item.name}</p>
+                            <p className="text-xs text-muted-foreground">{item.totalBookings} bookings</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">₹{item.totalEarnings.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">Total earned</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </motion.div>
       </main>
 
-      {/* Confirmation Dialog */}
+      {/* Confirm Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {dialogAction === 'accept' ? 'Accept Booking Request?' : 'Reject Booking Request?'}
+              {dialogAction === 'accept' ? 'Accept Booking' : 'Decline Booking'}
             </DialogTitle>
             <DialogDescription>
               {dialogAction === 'accept'
-                ? `You are about to accept the booking request from ${selectedRequest?.farmerName} for ${selectedRequest?.equipmentName}.`
-                : `You are about to reject the booking request from ${selectedRequest?.farmerName}.`}
+                ? `Accept booking from ${selectedRequest?.farmerName} for ${selectedRequest?.equipmentName}?`
+                : `Decline booking from ${selectedRequest?.farmerName}?`
+              }
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDialog(false)}>
               Cancel
             </Button>
-            <Button
+            <Button 
               variant={dialogAction === 'accept' ? 'default' : 'destructive'}
               onClick={confirmAction}
             >
-              {dialogAction === 'accept' ? 'Accept' : 'Reject'}
+              {dialogAction === 'accept' ? 'Accept' : 'Decline'}
             </Button>
           </DialogFooter>
         </DialogContent>

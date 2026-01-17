@@ -2,16 +2,20 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { 
-  Calendar as CalendarIcon, 
   Clock, 
   CreditCard, 
   RefreshCw,
   Tractor,
   MapPin,
-  IndianRupee,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Package,
+  Star,
+  ArrowRight,
+  Sparkles,
+  TrendingUp,
+  ShoppingBag
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -19,94 +23,151 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
 import { useAuthStore } from '@/store/authStore';
 import { useBookingStore, Booking } from '@/store/bookingStore';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-// Mock payment history data
-const mockPayments = [
-  {
-    id: '1',
-    date: new Date('2024-02-15'),
-    amount: 2400,
-    status: 'completed',
-    method: 'UPI',
-    equipmentName: 'John Deere 5050D Tractor',
-    transactionId: 'TXN123456789'
-  },
-  {
-    id: '2',
-    date: new Date('2024-02-10'),
-    amount: 1500,
-    status: 'completed',
-    method: 'Card',
-    equipmentName: 'Mahindra Rotavator',
-    transactionId: 'TXN987654321'
-  },
-  {
-    id: '3',
-    date: new Date('2024-02-05'),
-    amount: 3000,
-    status: 'refunded',
-    method: 'Wallet',
-    equipmentName: 'DJI Agras T30 Drone',
-    transactionId: 'TXN456789123'
-  },
-  {
-    id: '4',
-    date: new Date('2024-01-28'),
-    amount: 800,
-    status: 'completed',
-    method: 'UPI',
-    equipmentName: 'Seed Drill Machine',
-    transactionId: 'TXN789123456'
-  }
-];
-
 const statusConfig = {
-  pending: { color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20', icon: AlertCircle },
-  confirmed: { color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: CheckCircle },
-  ongoing: { color: 'bg-primary/10 text-primary border-primary/20', icon: Clock },
-  completed: { color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: CheckCircle },
-  cancelled: { color: 'bg-destructive/10 text-destructive border-destructive/20', icon: XCircle },
+  pending: { color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20', icon: AlertCircle, label: 'Pending' },
+  confirmed: { color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: CheckCircle, label: 'Confirmed' },
+  ongoing: { color: 'bg-primary/10 text-primary border-primary/20', icon: Clock, label: 'Ongoing' },
+  completed: { color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: CheckCircle, label: 'Delivered' },
+  cancelled: { color: 'bg-destructive/10 text-destructive border-destructive/20', icon: XCircle, label: 'Cancelled' },
 };
 
-const paymentStatusConfig = {
-  completed: { color: 'bg-green-500/10 text-green-600', label: 'Paid' },
-  pending: { color: 'bg-yellow-500/10 text-yellow-600', label: 'Pending' },
-  refunded: { color: 'bg-blue-500/10 text-blue-600', label: 'Refunded' },
-  failed: { color: 'bg-destructive/10 text-destructive', label: 'Failed' },
-};
+// Recommended equipment based on user history
+const recommendedEquipment = [
+  { id: '1', name: 'John Deere 5310', type: 'Tractor', price: 800, rating: 4.8, image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200' },
+  { id: '2', name: 'Mahindra Rotavator', type: 'Tiller', price: 500, rating: 4.6, image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=200' },
+  { id: '3', name: 'DJI Agras Drone', type: 'Drone', price: 2000, rating: 4.9, image: 'https://images.unsplash.com/photo-1508444845599-5c89863b1c44?w=200' },
+];
 
 export default function FarmerDashboard() {
   const { t } = useTranslation();
   const { user } = useAuthStore();
   const { bookings } = useBookingStore();
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   // Filter bookings for the logged-in farmer
   const farmerBookings = bookings.filter(b => b.farmerId === user?.id);
   
-  // Get upcoming bookings (not completed or cancelled)
-  const upcomingBookings = farmerBookings.filter(
+  // Get active bookings
+  const activeBookings = farmerBookings.filter(
     b => b.status !== 'completed' && b.status !== 'cancelled'
   );
-
-  // Get dates with bookings for calendar highlighting
-  const bookedDates = farmerBookings.map(b => b.startDate);
 
   const handleRebook = (booking: Booking) => {
     navigate(`/equipment/${booking.equipmentId}`);
   };
 
   const stats = [
-    { label: 'Active Bookings', value: upcomingBookings.length, icon: Tractor, color: 'text-primary' },
-    { label: 'Total Spent', value: '₹12,700', icon: IndianRupee, color: 'text-agri-gold' },
-    { label: 'Completed Rentals', value: farmerBookings.filter(b => b.status === 'completed').length, icon: CheckCircle, color: 'text-green-600' },
+    { label: 'Active Orders', value: activeBookings.length, icon: Package, color: 'text-primary', bgColor: 'bg-primary/10' },
+    { label: 'Completed', value: farmerBookings.filter(b => b.status === 'completed').length, icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-500/10' },
+    { label: 'Total Rentals', value: farmerBookings.length, icon: ShoppingBag, color: 'text-secondary', bgColor: 'bg-secondary/10' },
   ];
+
+  const renderOrderCard = (booking: Booking) => {
+    const StatusIcon = statusConfig[booking.status].icon;
+    
+    return (
+      <motion.div
+        key={booking.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -2 }}
+        className="border rounded-xl overflow-hidden bg-card hover:shadow-md transition-all"
+      >
+        <div className="flex flex-col sm:flex-row">
+          {/* Equipment Image */}
+          <div className="sm:w-36 h-28 sm:h-auto bg-muted flex items-center justify-center">
+            <Tractor className="w-12 h-12 text-muted-foreground" />
+          </div>
+          
+          {/* Order Details */}
+          <div className="flex-1 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold">{booking.equipmentName}</h3>
+                  <Badge 
+                    variant="outline" 
+                    className={statusConfig[booking.status].color}
+                  >
+                    <StatusIcon className="w-3 h-3 mr-1" />
+                    {statusConfig[booking.status].label}
+                  </Badge>
+                </div>
+                
+                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {format(booking.startDate, 'MMM dd')} • {booking.duration}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    {booking.location}
+                  </span>
+                </div>
+                
+                {booking.withOperator && (
+                  <Badge variant="secondary" className="text-xs mt-1">
+                    With Operator
+                  </Badge>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-lg">₹{booking.totalPrice.toLocaleString()}</span>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleRebook(booking)}
+                  className="gap-1"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Rebook
+                </Button>
+              </div>
+            </div>
+
+            {/* Order Progress - Flipkart style */}
+            {booking.status !== 'cancelled' && booking.status !== 'completed' && (
+              <div className="mt-4 pt-3 border-t">
+                <div className="flex items-center gap-2 overflow-x-auto pb-2">
+                  {['Confirmed', 'Preparing', 'On the way', 'Delivered'].map((step, idx) => {
+                    const currentStep = booking.status === 'pending' ? 0 : 
+                                        booking.status === 'confirmed' ? 1 : 
+                                        booking.status === 'ongoing' ? 2 : 3;
+                    const isActive = idx <= currentStep;
+                    const isCurrent = idx === currentStep;
+                    
+                    return (
+                      <div key={step} className="flex items-center">
+                        <div className={`flex flex-col items-center min-w-[60px]`}>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                            isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                          } ${isCurrent ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+                            {isActive ? <CheckCircle className="w-4 h-4" /> : idx + 1}
+                          </div>
+                          <span className={`text-[10px] mt-1 ${isActive ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                            {step}
+                          </span>
+                        </div>
+                        {idx < 3 && (
+                          <div className={`w-8 h-0.5 mx-1 ${idx < currentStep ? 'bg-primary' : 'bg-muted'}`} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,13 +179,13 @@ export default function FarmerDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-6"
           >
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Welcome back, <span className="text-primary">{user?.name || 'Farmer'}</span>
+            <h1 className="text-2xl md:text-3xl font-bold mb-1">
+              Hi, <span className="text-primary">{user?.name || 'Farmer'}</span>!
             </h1>
             <p className="text-muted-foreground">
-              Manage your equipment rentals and bookings
+              Track your rentals and discover new equipment
             </p>
           </motion.div>
 
@@ -133,280 +194,133 @@ export default function FarmerDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+            className="grid grid-cols-3 gap-3 mb-6"
           >
             {stats.map((stat, index) => (
               <Card key={index} className="border-border/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.label}</p>
-                      <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                    </div>
-                    <div className={`p-3 rounded-full bg-muted ${stat.color}`}>
-                      <stat.icon className="w-6 h-6" />
-                    </div>
+                <CardContent className="p-4 text-center">
+                  <div className={`w-10 h-10 rounded-full ${stat.bgColor} flex items-center justify-center mx-auto mb-2`}>
+                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
                   </div>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </CardContent>
               </Card>
             ))}
           </motion.div>
 
-          {/* Main Content Tabs */}
+          {/* Main Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Tabs defaultValue="bookings" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-                <TabsTrigger value="bookings" className="gap-2">
-                  <Tractor className="w-4 h-4" />
-                  <span className="hidden sm:inline">My Bookings</span>
+            <Tabs defaultValue="orders" className="space-y-4">
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="orders" className="gap-2">
+                  <Package className="w-4 h-4" />
+                  My Orders
                 </TabsTrigger>
-                <TabsTrigger value="calendar" className="gap-2">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span className="hidden sm:inline">Calendar</span>
-                </TabsTrigger>
-                <TabsTrigger value="payments" className="gap-2">
-                  <CreditCard className="w-4 h-4" />
-                  <span className="hidden sm:inline">Payments</span>
+                <TabsTrigger value="discover" className="gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Discover
                 </TabsTrigger>
               </TabsList>
 
-              {/* Bookings Tab */}
-              <TabsContent value="bookings" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">Your Bookings</h2>
-                  <Button variant="outline" size="sm" onClick={() => navigate('/equipment')}>
-                    Browse Equipment
-                  </Button>
-                </div>
-                
+              {/* Orders Tab */}
+              <TabsContent value="orders" className="space-y-4">
                 {farmerBookings.length === 0 ? (
                   <Card className="border-dashed">
                     <CardContent className="p-12 text-center">
-                      <Tractor className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No bookings yet</h3>
+                      <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No orders yet</h3>
                       <p className="text-muted-foreground mb-4">
                         Start by browsing available equipment
                       </p>
                       <Button onClick={() => navigate('/equipment')}>
-                        Find Equipment
+                        Browse Equipment
+                        <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid gap-4">
-                    {farmerBookings.map((booking) => {
-                      const StatusIcon = statusConfig[booking.status].icon;
-                      return (
-                        <Card key={booking.id} className="overflow-hidden">
-                          <CardContent className="p-0">
-                            <div className="flex flex-col md:flex-row">
-                              {/* Equipment Image Placeholder */}
-                              <div className="w-full md:w-48 h-32 md:h-auto bg-muted flex items-center justify-center">
-                                <Tractor className="w-12 h-12 text-muted-foreground" />
-                              </div>
-                              
-                              {/* Booking Details */}
-                              <div className="flex-1 p-4 md:p-6">
-                                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                  <div className="space-y-2">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <h3 className="font-semibold text-lg">{booking.equipmentName}</h3>
-                                      <Badge 
-                                        variant="outline" 
-                                        className={statusConfig[booking.status].color}
-                                      >
-                                        <StatusIcon className="w-3 h-3 mr-1" />
-                                        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                                      </Badge>
-                                    </div>
-                                    
-                                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                                      <span className="flex items-center gap-1">
-                                        <CalendarIcon className="w-4 h-4" />
-                                        {format(booking.startDate, 'MMM dd, yyyy')}
-                                      </span>
-                                      <span className="flex items-center gap-1">
-                                        <Clock className="w-4 h-4" />
-                                        {booking.duration}
-                                      </span>
-                                      <span className="flex items-center gap-1">
-                                        <MapPin className="w-4 h-4" />
-                                        {booking.location}
-                                      </span>
-                                    </div>
-                                    
-                                    {booking.withOperator && (
-                                      <Badge variant="secondary" className="text-xs">
-                                        With Operator
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  
-                                  <div className="flex flex-col items-end gap-2">
-                                    <p className="text-xl font-bold text-primary">
-                                      ₹{booking.totalPrice.toLocaleString()}
-                                    </p>
-                                    {booking.status === 'completed' && (
-                                      <Button 
-                                        size="sm" 
-                                        variant="outline"
-                                        onClick={() => handleRebook(booking)}
-                                        className="gap-1"
-                                      >
-                                        <RefreshCw className="w-3 h-3" />
-                                        Rebook
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                  <div className="space-y-3">
+                    {farmerBookings.map(renderOrderCard)}
                   </div>
                 )}
               </TabsContent>
 
-              {/* Calendar Tab */}
-              <TabsContent value="calendar" className="space-y-4">
-                <h2 className="text-xl font-semibold">Upcoming Rentals</h2>
-                
-                <div className="grid gap-6 lg:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Rental Calendar</CardTitle>
-                      <CardDescription>View your scheduled equipment rentals</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={setSelectedDate}
-                        className="rounded-md border pointer-events-auto"
-                        modifiers={{
-                          booked: bookedDates,
-                        }}
-                        modifiersStyles={{
-                          booked: {
-                            backgroundColor: 'hsl(var(--primary))',
-                            color: 'hsl(var(--primary-foreground))',
-                            borderRadius: '50%',
-                          },
-                        }}
-                      />
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Scheduled Rentals</CardTitle>
-                      <CardDescription>
-                        {upcomingBookings.length} upcoming {upcomingBookings.length === 1 ? 'rental' : 'rentals'}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {upcomingBookings.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          No upcoming rentals scheduled
-                        </p>
-                      ) : (
-                        upcomingBookings.map((booking) => (
-                          <div
-                            key={booking.id}
-                            className="flex items-center gap-4 p-3 rounded-lg bg-muted/50"
-                          >
-                            <div className="p-2 rounded-full bg-primary/10">
-                              <Tractor className="w-5 h-5 text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">{booking.equipmentName}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {format(booking.startDate, 'MMM dd')} • {booking.duration}
-                              </p>
-                            </div>
-                            <Badge 
-                              variant="outline"
-                              className={statusConfig[booking.status].color}
-                            >
-                              {booking.status}
-                            </Badge>
+              {/* Discover Tab - Flipkart style recommendations */}
+              <TabsContent value="discover" className="space-y-6">
+                {/* Recently Viewed / Recommended */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                      Recommended for You
+                    </h3>
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/equipment')}>
+                      View All <ArrowRight className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {recommendedEquipment.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        whileHover={{ y: -4 }}
+                        className="border rounded-xl overflow-hidden bg-card cursor-pointer"
+                        onClick={() => navigate(`/equipment/${item.id}`)}
+                      >
+                        <div className="h-28 bg-muted">
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="p-3">
+                          <p className="font-medium text-sm truncate">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">{item.type}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="font-bold text-primary">₹{item.price}/hr</span>
+                            <span className="text-xs flex items-center gap-0.5">
+                              <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                              {item.rating}
+                            </span>
                           </div>
-                        ))
-                      )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/equipment')}>
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Tractor className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Browse All</p>
+                        <p className="text-xs text-muted-foreground">100+ Equipment</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/ai-recommend')}>
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                        <Sparkles className="w-6 h-6 text-secondary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">AI Suggest</p>
+                        <p className="text-xs text-muted-foreground">Get Recommendations</p>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
-              </TabsContent>
-
-              {/* Payments Tab */}
-              <TabsContent value="payments" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">Payment History</h2>
-                  <Button variant="outline" size="sm">
-                    Download Statement
-                  </Button>
-                </div>
-                
-                <Card>
-                  <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-muted/50">
-                          <tr>
-                            <th className="text-left p-4 font-medium">Date</th>
-                            <th className="text-left p-4 font-medium">Equipment</th>
-                            <th className="text-left p-4 font-medium">Method</th>
-                            <th className="text-left p-4 font-medium">Status</th>
-                            <th className="text-right p-4 font-medium">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {mockPayments.map((payment) => (
-                            <tr key={payment.id} className="hover:bg-muted/30 transition-colors">
-                              <td className="p-4">
-                                <div>
-                                  <p className="font-medium">{format(payment.date, 'MMM dd, yyyy')}</p>
-                                  <p className="text-xs text-muted-foreground">{payment.transactionId}</p>
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <p className="font-medium">{payment.equipmentName}</p>
-                              </td>
-                              <td className="p-4">
-                                <Badge variant="secondary">{payment.method}</Badge>
-                              </td>
-                              <td className="p-4">
-                                <Badge 
-                                  variant="outline"
-                                  className={paymentStatusConfig[payment.status as keyof typeof paymentStatusConfig].color}
-                                >
-                                  {paymentStatusConfig[payment.status as keyof typeof paymentStatusConfig].label}
-                                </Badge>
-                              </td>
-                              <td className="p-4 text-right">
-                                <p className="font-semibold">
-                                  {payment.status === 'refunded' ? '-' : ''}₹{payment.amount.toLocaleString()}
-                                </p>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
             </Tabs>
           </motion.div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

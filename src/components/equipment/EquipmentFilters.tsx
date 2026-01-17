@@ -112,17 +112,36 @@ export function EquipmentFilters({ filters, onFilterChange }: EquipmentFiltersPr
 
       {/* Price Range */}
       <div className="mb-6">
-        <Label className="mb-4 block">
-          Price Range (₹{filters.priceRange[0]} - ₹{filters.priceRange[1]}/hr)
-        </Label>
-        <Slider
-          value={filters.priceRange}
-          onValueChange={(value) => updateFilter('priceRange', value as [number, number])}
-          min={0}
-          max={5000}
-          step={100}
-          className="mt-2"
-        />
+        <Label className="mb-3 block font-medium">Max Price</Label>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">₹0</span>
+            <span className="font-semibold text-primary">₹{filters.priceRange[1]}/hr</span>
+          </div>
+          <Slider
+            value={[filters.priceRange[1]]}
+            onValueChange={(value) => updateFilter('priceRange', [0, value[0]])}
+            min={100}
+            max={5000}
+            step={100}
+            className="mt-2"
+          />
+          <div className="flex gap-2 flex-wrap">
+            {[500, 1000, 2000, 3000, 5000].map((price) => (
+              <button
+                key={price}
+                onClick={() => updateFilter('priceRange', [0, price])}
+                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                  filters.priceRange[1] === price 
+                    ? 'bg-primary text-primary-foreground border-primary' 
+                    : 'bg-muted hover:bg-muted/80 border-border'
+                }`}
+              >
+                ₹{price}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Status */}
