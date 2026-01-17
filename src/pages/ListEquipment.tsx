@@ -22,34 +22,36 @@ import {
   Users,
   Shield,
   TrendingUp,
-  Star
+  Camera,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const equipmentTypes = [
-  { value: 'tractor', label: 'Tractor' },
-  { value: 'harvester', label: 'Harvester' },
-  { value: 'drone', label: 'Agricultural Drone' },
-  { value: 'tiller', label: 'Tiller / Rotavator' },
-  { value: 'pump', label: 'Water Pump' },
-  { value: 'sprayer', label: 'Sprayer' },
-  { value: 'seeder', label: 'Seeder / Planter' },
-  { value: 'cultivator', label: 'Cultivator' },
-  { value: 'trailer', label: 'Trailer' },
-  { value: 'other', label: 'Other' },
+  { value: 'tractor', label: 'Tractor', icon: '🚜' },
+  { value: 'harvester', label: 'Harvester', icon: '🌾' },
+  { value: 'drone', label: 'Agricultural Drone', icon: '🚁' },
+  { value: 'tiller', label: 'Tiller / Rotavator', icon: '⚙️' },
+  { value: 'pump', label: 'Water Pump', icon: '💧' },
+  { value: 'sprayer', label: 'Sprayer', icon: '💨' },
+  { value: 'seeder', label: 'Seeder / Planter', icon: '🌱' },
+  { value: 'cultivator', label: 'Cultivator', icon: '🔧' },
+  { value: 'trailer', label: 'Trailer', icon: '🚛' },
+  { value: 'other', label: 'Other', icon: '📦' },
 ];
 
 const conditions = [
-  { value: 'excellent', label: 'Excellent - Like New' },
-  { value: 'good', label: 'Good - Well Maintained' },
-  { value: 'fair', label: 'Fair - Working Condition' },
+  { value: 'excellent', label: 'Excellent - Like New', description: 'Less than 1 year old, minimal usage' },
+  { value: 'good', label: 'Good - Well Maintained', description: 'Regular maintenance, good working condition' },
+  { value: 'fair', label: 'Fair - Working Condition', description: 'Older but functional, may need minor repairs' },
 ];
 
 const benefits = [
-  { icon: IndianRupee, title: 'Earn Extra Income', description: 'Make money from your idle equipment' },
-  { icon: Shield, title: 'Full Insurance', description: 'We cover damage and theft' },
-  { icon: Users, title: 'Verified Renters', description: 'Only verified farmers can book' },
-  { icon: TrendingUp, title: 'Price Control', description: 'You set your own rates' },
+  { icon: IndianRupee, title: 'Earn ₹15K+/month', description: 'Average owner earnings' },
+  { icon: Shield, title: 'Full Insurance', description: 'Damage & theft covered' },
+  { icon: Users, title: 'Verified Renters', description: 'Only verified farmers' },
+  { icon: TrendingUp, title: 'You Set Prices', description: 'Full control over rates' },
 ];
 
 const ListEquipment = () => {
@@ -77,7 +79,7 @@ const ListEquipment = () => {
   const handleSubmit = () => {
     toast({
       title: 'Equipment Listed Successfully!',
-      description: 'Your equipment is now visible to farmers. You will receive booking requests soon.',
+      description: 'Your equipment is now visible to farmers.',
     });
     navigate('/owner-dashboard');
   };
@@ -86,123 +88,137 @@ const ListEquipment = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const isStep1Valid = formData.name && formData.type && formData.condition && formData.location;
+  const isStep2Valid = formData.pricePerHour && formData.pricePerDay;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4">
+      <main className="pt-20 pb-16">
+        <div className="container mx-auto px-4 max-w-2xl">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
               <Tractor className="w-5 h-5" />
               <span className="font-medium">List Your Equipment</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              Turn Your Idle Equipment Into Income
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+              Start Earning Today
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Join 5,000+ equipment owners earning an average of ₹15,000/month by renting their farm equipment
+            <p className="text-muted-foreground">
+              Join 5,000+ owners earning by renting their equipment
             </p>
           </motion.div>
 
-          {/* Benefits */}
+          {/* Benefits - Compact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid md:grid-cols-4 gap-4 mb-12"
+            className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
           >
             {benefits.map((benefit, index) => (
-              <Card key={index} className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                    <benefit.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold mb-1">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
-                </CardContent>
-              </Card>
+              <div key={index} className="text-center p-3 bg-muted/50 rounded-xl">
+                <benefit.icon className="w-5 h-5 text-primary mx-auto mb-1" />
+                <p className="font-medium text-sm">{benefit.title}</p>
+                <p className="text-xs text-muted-foreground">{benefit.description}</p>
+              </div>
             ))}
           </motion.div>
+
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                  step >= s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
+                </div>
+                {s < 3 && (
+                  <div className={`w-12 h-1 mx-1 rounded ${step > s ? 'bg-primary' : 'bg-muted'}`} />
+                )}
+              </div>
+            ))}
+          </div>
 
           {/* Form */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="max-w-3xl mx-auto"
           >
-            {/* Progress Steps */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              {[1, 2, 3].map((s) => (
-                <div key={s} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    step >= s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {step > s ? <CheckCircle2 className="w-5 h-5" /> : s}
-                  </div>
-                  {s < 3 && (
-                    <div className={`w-16 h-1 mx-2 ${step > s ? 'bg-primary' : 'bg-muted'}`} />
-                  )}
-                </div>
-              ))}
-            </div>
-
             <Card>
-              <CardHeader>
-                <CardTitle>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">
                   {step === 1 && 'Equipment Details'}
-                  {step === 2 && 'Pricing & Availability'}
+                  {step === 2 && 'Pricing & Options'}
                   {step === 3 && 'Photos & Review'}
                 </CardTitle>
                 <CardDescription>
                   {step === 1 && 'Tell us about your equipment'}
-                  {step === 2 && 'Set your rental rates and preferences'}
-                  {step === 3 && 'Add photos and review your listing'}
+                  {step === 2 && 'Set your rental rates'}
+                  {step === 3 && 'Add photos and submit'}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 {step === 1 && (
-                  <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Equipment Name *</Label>
-                        <Input
-                          placeholder="e.g., Mahindra 575 DI Tractor"
-                          value={formData.name}
-                          onChange={(e) => updateFormData('name', e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Equipment Type *</Label>
-                        <Select
-                          value={formData.type}
-                          onValueChange={(value) => updateFormData('type', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {equipmentTypes.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  <>
+                    <div className="space-y-2">
+                      <Label>Equipment Name *</Label>
+                      <Input
+                        placeholder="e.g., Mahindra 575 DI Tractor"
+                        value={formData.name}
+                        onChange={(e) => updateFormData('name', e.target.value)}
+                      />
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Equipment Type *</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {equipmentTypes.slice(0, 6).map((type) => (
+                          <button
+                            key={type.value}
+                            type="button"
+                            onClick={() => updateFormData('type', type.value)}
+                            className={`p-3 rounded-xl border text-left transition-all ${
+                              formData.type === type.value 
+                                ? 'border-primary bg-primary/5' 
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <span className="text-lg mr-2">{type.icon}</span>
+                            <span className="text-sm font-medium">{type.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <Select
+                        value={formData.type}
+                        onValueChange={(value) => updateFormData('type', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Or select from all types" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {equipmentTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.icon} {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
                       <div className="space-y-2">
                         <Label>Brand</Label>
                         <Input
-                          placeholder="e.g., Mahindra"
+                          placeholder="Mahindra"
                           value={formData.brand}
                           onChange={(e) => updateFormData('brand', e.target.value)}
                         />
@@ -210,7 +226,7 @@ const ListEquipment = () => {
                       <div className="space-y-2">
                         <Label>Model</Label>
                         <Input
-                          placeholder="e.g., 575 DI"
+                          placeholder="575 DI"
                           value={formData.model}
                           onChange={(e) => updateFormData('model', e.target.value)}
                         />
@@ -218,7 +234,7 @@ const ListEquipment = () => {
                       <div className="space-y-2">
                         <Label>Year</Label>
                         <Input
-                          placeholder="e.g., 2020"
+                          placeholder="2020"
                           value={formData.year}
                           onChange={(e) => updateFormData('year', e.target.value)}
                         />
@@ -227,31 +243,23 @@ const ListEquipment = () => {
 
                     <div className="space-y-2">
                       <Label>Condition *</Label>
-                      <Select
-                        value={formData.condition}
-                        onValueChange={(value) => updateFormData('condition', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select condition" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {conditions.map((cond) => (
-                            <SelectItem key={cond.value} value={cond.value}>
-                              {cond.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Textarea
-                        placeholder="Describe your equipment, its features, and any special notes..."
-                        value={formData.description}
-                        onChange={(e) => updateFormData('description', e.target.value)}
-                        rows={4}
-                      />
+                      <div className="space-y-2">
+                        {conditions.map((cond) => (
+                          <button
+                            key={cond.value}
+                            type="button"
+                            onClick={() => updateFormData('condition', cond.value)}
+                            className={`w-full p-3 rounded-xl border text-left transition-all ${
+                              formData.condition === cond.value 
+                                ? 'border-primary bg-primary/5' 
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <p className="font-medium text-sm">{cond.label}</p>
+                            <p className="text-xs text-muted-foreground">{cond.description}</p>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-2">
@@ -265,12 +273,12 @@ const ListEquipment = () => {
                         onChange={(e) => updateFormData('location', e.target.value)}
                       />
                     </div>
-                  </div>
+                  </>
                 )}
 
                 {step === 2 && (
-                  <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="flex items-center gap-2">
                           <IndianRupee className="w-4 h-4" />
@@ -278,7 +286,7 @@ const ListEquipment = () => {
                         </Label>
                         <Input
                           type="number"
-                          placeholder="e.g., 500"
+                          placeholder="500"
                           value={formData.pricePerHour}
                           onChange={(e) => updateFormData('pricePerHour', e.target.value)}
                         />
@@ -290,136 +298,139 @@ const ListEquipment = () => {
                         </Label>
                         <Input
                           type="number"
-                          placeholder="e.g., 3000"
+                          placeholder="3000"
                           value={formData.pricePerDay}
                           onChange={(e) => updateFormData('pricePerDay', e.target.value)}
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center gap-2">
+                    <div className="space-y-3">
+                      <Label className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
                         Additional Options
-                      </h3>
+                      </Label>
                       
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <div className="font-medium">Operator Available</div>
-                          <div className="text-sm text-muted-foreground">
-                            Can you provide an operator with the equipment?
+                      {[
+                        { 
+                          key: 'operatorAvailable', 
+                          label: 'Operator Available', 
+                          description: 'Can provide an operator' 
+                        },
+                        { 
+                          key: 'fuelIncluded', 
+                          label: 'Fuel Included', 
+                          description: 'Fuel cost in rental price' 
+                        },
+                        { 
+                          key: 'deliveryAvailable', 
+                          label: 'Delivery Available', 
+                          description: 'Can deliver to location' 
+                        },
+                      ].map((option) => (
+                        <div 
+                          key={option.key}
+                          className="flex items-center justify-between p-3 border rounded-xl"
+                        >
+                          <div>
+                            <div className="font-medium text-sm">{option.label}</div>
+                            <div className="text-xs text-muted-foreground">{option.description}</div>
                           </div>
+                          <Switch
+                            checked={formData[option.key as keyof typeof formData] as boolean}
+                            onCheckedChange={(checked) => updateFormData(option.key, checked)}
+                          />
                         </div>
-                        <Switch
-                          checked={formData.operatorAvailable}
-                          onCheckedChange={(checked) => updateFormData('operatorAvailable', checked)}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <div className="font-medium">Fuel Included</div>
-                          <div className="text-sm text-muted-foreground">
-                            Is fuel cost included in the rental price?
-                          </div>
-                        </div>
-                        <Switch
-                          checked={formData.fuelIncluded}
-                          onCheckedChange={(checked) => updateFormData('fuelIncluded', checked)}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <div className="font-medium">Delivery Available</div>
-                          <div className="text-sm text-muted-foreground">
-                            Can you deliver equipment to the renter's location?
-                          </div>
-                        </div>
-                        <Switch
-                          checked={formData.deliveryAvailable}
-                          onCheckedChange={(checked) => updateFormData('deliveryAvailable', checked)}
-                        />
-                      </div>
+                      ))}
                     </div>
-                  </div>
+
+                    <div className="space-y-2">
+                      <Label>Description (Optional)</Label>
+                      <Textarea
+                        placeholder="Add any additional details about your equipment..."
+                        value={formData.description}
+                        onChange={(e) => updateFormData('description', e.target.value)}
+                        rows={3}
+                      />
+                    </div>
+                  </>
                 )}
 
                 {step === 3 && (
-                  <div className="space-y-6">
+                  <>
                     <div className="space-y-2">
                       <Label>Equipment Photos</Label>
-                      <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                        <Upload className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground mb-2">
-                          Drag and drop photos or click to upload
+                      <div className="border-2 border-dashed rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                        <Camera className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+                        <p className="text-muted-foreground text-sm mb-2">
+                          Tap to add photos
                         </p>
-                        <Button variant="outline">Choose Files</Button>
+                        <Button variant="outline" size="sm">
+                          <Upload className="w-4 h-4 mr-2" />
+                          Choose Files
+                        </Button>
                         <p className="text-xs text-muted-foreground mt-2">
-                          Add at least 3 photos. First photo will be the cover.
+                          Add at least 3 clear photos
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Review Your Listing</h3>
-                      <Card className="bg-muted/50">
-                        <CardContent className="pt-6">
-                          <div className="grid md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Equipment:</span>
-                              <span className="ml-2 font-medium">{formData.name || 'Not set'}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Type:</span>
-                              <span className="ml-2 font-medium">{formData.type || 'Not set'}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Location:</span>
-                              <span className="ml-2 font-medium">{formData.location || 'Not set'}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Condition:</span>
-                              <span className="ml-2 font-medium">{formData.condition || 'Not set'}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Price/Hour:</span>
-                              <span className="ml-2 font-medium">₹{formData.pricePerHour || '0'}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Price/Day:</span>
-                              <span className="ml-2 font-medium">₹{formData.pricePerDay || '0'}</span>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap gap-2 mt-4">
-                            {formData.operatorAvailable && (
-                              <Badge variant="secondary">Operator Available</Badge>
-                            )}
-                            {formData.fuelIncluded && (
-                              <Badge variant="secondary">Fuel Included</Badge>
-                            )}
-                            {formData.deliveryAvailable && (
-                              <Badge variant="secondary">Delivery Available</Badge>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                    <div className="space-y-3">
+                      <Label>Review Your Listing</Label>
+                      <div className="p-4 bg-muted/50 rounded-xl space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Equipment</span>
+                          <span className="font-medium">{formData.name || 'Not set'}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Type</span>
+                          <span className="font-medium">{equipmentTypes.find(t => t.value === formData.type)?.label || 'Not set'}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Location</span>
+                          <span className="font-medium">{formData.location || 'Not set'}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Hourly Rate</span>
+                          <span className="font-medium text-primary">₹{formData.pricePerHour || '0'}/hr</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Daily Rate</span>
+                          <span className="font-medium text-primary">₹{formData.pricePerDay || '0'}/day</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 pt-2 border-t">
+                          {formData.operatorAvailable && (
+                            <Badge variant="secondary">Operator</Badge>
+                          )}
+                          {formData.fuelIncluded && (
+                            <Badge variant="secondary">Fuel Included</Badge>
+                          )}
+                          {formData.deliveryAvailable && (
+                            <Badge variant="secondary">Delivery</Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between mt-8">
+                <div className="flex justify-between pt-4">
                   <Button
                     variant="outline"
                     onClick={() => setStep(s => Math.max(1, s - 1))}
                     disabled={step === 1}
                   >
-                    Previous
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
                   </Button>
                   {step < 3 ? (
-                    <Button onClick={() => setStep(s => s + 1)}>
+                    <Button 
+                      onClick={() => setStep(s => s + 1)}
+                      disabled={step === 1 ? !isStep1Valid : !isStep2Valid}
+                    >
                       Continue
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   ) : (
                     <Button onClick={handleSubmit}>
@@ -427,30 +438,6 @@ const ListEquipment = () => {
                       List Equipment
                     </Button>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Testimonial */}
-            <Card className="mt-8 bg-primary/5 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100"
-                    alt="Owner"
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                      ))}
-                    </div>
-                    <p className="text-sm italic mb-2">
-                      "I listed my tractor last year and have earned ₹2,50,000+ in rentals. The platform handles everything - bookings, payments, and even insurance!"
-                    </p>
-                    <p className="text-sm font-medium">- Rajesh Kumar, Tractor Owner from Maharashtra</p>
-                  </div>
                 </div>
               </CardContent>
             </Card>

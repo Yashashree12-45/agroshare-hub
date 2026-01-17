@@ -75,7 +75,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   
   const [step, setStep] = useState<BookingStep>('schedule');
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [duration, setDuration] = useState('4');
+  const [duration, setDuration] = useState('1');
   const [withOperator, setWithOperator] = useState(false);
   const [selectedOperator, setSelectedOperator] = useState<Operator | null>(null);
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('delivery');
@@ -115,12 +115,10 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const pickupDiscount = !withOperator && deliveryOption === 'pickup' ? Math.floor(equipment.transportCharge * 0.5) : 0;
   const totalCost = baseCost + totalOperatorCost + (withOperator ? equipment.transportCharge : deliveryCost) - pickupDiscount;
 
-  const timeSlots = [
-    { value: '2', label: `2 ${t('booking.hours')}` },
-    { value: '4', label: `4 ${t('booking.hours')}` },
-    { value: '8', label: `${t('booking.fullDay')} (8 ${t('booking.hours')})` },
-    { value: 'custom', label: t('booking.custom') },
-  ];
+  const hourOptions = Array.from({ length: 12 }, (_, i) => ({
+    value: String(i + 1),
+    label: `${i + 1} ${i + 1 === 1 ? t('booking.hour') : t('booking.hours')}`,
+  }));
 
   const handleAddressChange = (address: string, coords?: { lat: number; lng: number }) => {
     setDeliveryAddress(address);
@@ -194,7 +192,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const handleClose = () => {
     setStep('schedule');
     setDate(undefined);
-    setDuration('4');
+    setDuration('1');
     setWithOperator(false);
     setSelectedOperator(null);
     setDeliveryAddress('');
@@ -281,19 +279,35 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
         </Label>
         <Select value={duration} onValueChange={setDuration}>
           <SelectTrigger className="h-12 border-2 hover:border-primary/50">
-            <SelectValue />
+            <SelectValue placeholder="Select hours" />
           </SelectTrigger>
-          <SelectContent>
-            {timeSlots.map((slot) => (
-              <SelectItem key={slot.value} value={slot.value}>
+          <SelectContent className="max-h-60">
+            {hourOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-primary" />
-                  {slot.label}
+                  {option.label}
                 </div>
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <div className="flex gap-2 flex-wrap mt-2">
+          {[1, 2, 4, 6, 8].map((hr) => (
+            <button
+              key={hr}
+              type="button"
+              onClick={() => setDuration(String(hr))}
+              className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                duration === String(hr)
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-muted hover:bg-muted/80 border-border'
+              }`}
+            >
+              {hr} {hr === 1 ? 'hr' : 'hrs'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {date && (
