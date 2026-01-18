@@ -17,7 +17,11 @@ import {
   CreditCard,
   Shield,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  MessageSquare,
+  IndianRupee,
+  TrendingDown,
+  Percent
 } from 'lucide-react';
 import { Equipment } from '@/services/api';
 import { useBookingStore } from '@/store/bookingStore';
@@ -29,6 +33,9 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import {
   Dialog,
   DialogContent,
@@ -58,13 +65,14 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-type BookingStep = 'schedule' | 'operator' | 'delivery' | 'review' | 'success';
+type BookingStep = 'schedule' | 'operator' | 'delivery' | 'negotiate' | 'review' | 'success';
 
 const stepConfig = [
   { id: 'schedule', label: 'Schedule', icon: CalendarIcon },
   { id: 'operator', label: 'Operator', icon: UserCheck },
   { id: 'delivery', label: 'Delivery', icon: Truck },
-  { id: 'review', label: 'Review', icon: CreditCard },
+  { id: 'negotiate', label: 'Price', icon: CreditCard },
+  { id: 'review', label: 'Review', icon: Shield },
 ];
 
 export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
@@ -75,6 +83,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   
   const [step, setStep] = useState<BookingStep>('schedule');
   const [date, setDate] = useState<Date | undefined>(undefined);
+  const [durationType, setDurationType] = useState<'hours' | 'days'>('hours');
   const [duration, setDuration] = useState('1');
   const [withOperator, setWithOperator] = useState(false);
   const [selectedOperator, setSelectedOperator] = useState<Operator | null>(null);
@@ -82,6 +91,11 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryCoords, setDeliveryCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Negotiation state
+  const [negotiationEnabled, setNegotiationEnabled] = useState(false);
+  const [proposedPrice, setProposedPrice] = useState('');
+  const [negotiationMessage, setNegotiationMessage] = useState('');
 
   const currentStepIndex = stepConfig.findIndex(s => s.id === step);
 
@@ -108,16 +122,28 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   }, [deliveryCoords, deliveryOption, equipment.location, t]);
 
   const operatorCost = selectedOperator?.hourlyRate || 500;
-  const hours = duration === 'custom' ? 4 : parseInt(duration);
-  const baseCost = hours * equipment.pricePerHour;
+  const durationValue = parseInt(duration) || 1;
+  const hours = durationType === 'days' ? durationValue * 8 : durationValue; // 8 hours per day
+  const baseCost = durationType === 'days' 
+    ? durationValue * (equipment.pricePerHour * 8 * 0.9) // 10% discount for daily
+    : hours * equipment.pricePerHour;
   const totalOperatorCost = withOperator ? operatorCost * hours : 0;
   const deliveryCost = !withOperator && deliveryOption === 'delivery' ? equipment.transportCharge : 0;
   const pickupDiscount = !withOperator && deliveryOption === 'pickup' ? Math.floor(equipment.transportCharge * 0.5) : 0;
-  const totalCost = baseCost + totalOperatorCost + (withOperator ? equipment.transportCharge : deliveryCost) - pickupDiscount;
+  
+  // Calculate final price with negotiation
+  const calculatedTotal = baseCost + totalOperatorCost + (withOperator ? equipment.transportCharge : deliveryCost) - pickupDiscount;
+  const negotiatedDiscount = negotiationEnabled && proposedPrice ? Math.max(0, calculatedTotal - Number(proposedPrice)) : 0;
+  const totalCost = negotiationEnabled && proposedPrice ? Number(proposedPrice) : calculatedTotal;
 
   const hourOptions = Array.from({ length: 12 }, (_, i) => ({
     value: String(i + 1),
     label: `${i + 1} ${i + 1 === 1 ? t('booking.hour') : t('booking.hours')}`,
+  }));
+
+  const dayOptions = Array.from({ length: 7 }, (_, i) => ({
+    value: String(i + 1),
+    label: `${i + 1} ${i + 1 === 1 ? 'Day' : 'Days'}`,
   }));
 
   const handleAddressChange = (address: string, coords?: { lat: number; lng: number }) => {
@@ -131,6 +157,8 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
         return !!date;
       case 'operator':
         return true; // Optional step
+      case 'negotiate':
+        return true; // Optional step
       case 'delivery':
         if (withOperator) return true;
         if (deliveryOption === 'delivery') return !!deliveryAddress;
@@ -143,7 +171,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   };
 
   const handleNext = () => {
-    const steps: BookingStep[] = ['schedule', 'operator', 'delivery', 'review'];
+    const steps: BookingStep[] = ['schedule', 'operator', 'delivery', 'negotiate', 'review'];
     const currentIndex = steps.indexOf(step);
     if (currentIndex < steps.length - 1) {
       setStep(steps[currentIndex + 1]);
@@ -151,7 +179,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   };
 
   const handleBack = () => {
-    const steps: BookingStep[] = ['schedule', 'operator', 'delivery', 'review'];
+    const steps: BookingStep[] = ['schedule', 'operator', 'delivery', 'negotiate', 'review'];
     const currentIndex = steps.indexOf(step);
     if (currentIndex > 0) {
       setStep(steps[currentIndex - 1]);
@@ -178,8 +206,8 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
       ownerId: equipment.owner.id,
       startDate: date,
       endDate: date,
-      duration: `${hours} hours`,
-      status: 'pending',
+      duration: durationType === 'days' ? `${durationValue} days` : `${hours} hours`,
+      status: negotiationEnabled ? 'pending' : 'confirmed',
       totalPrice: totalCost,
       withOperator,
       location: `${equipment.location.village}, ${equipment.location.district}`,
@@ -193,11 +221,15 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
     setStep('schedule');
     setDate(undefined);
     setDuration('1');
+    setDurationType('hours');
     setWithOperator(false);
     setSelectedOperator(null);
     setDeliveryAddress('');
     setDeliveryCoords(null);
     setDeliveryOption('delivery');
+    setNegotiationEnabled(false);
+    setProposedPrice('');
+    setNegotiationMessage('');
     onClose();
   };
 
@@ -277,12 +309,39 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
           <Clock className="w-4 h-4 text-primary" />
           {t('booking.duration')}
         </Label>
+        
+        {/* Duration Type Toggle */}
+        <div className="flex gap-2 p-1 bg-muted rounded-lg">
+          <button
+            type="button"
+            onClick={() => { setDurationType('hours'); setDuration('1'); }}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              durationType === 'hours' 
+                ? 'bg-primary text-primary-foreground shadow-sm' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Hours
+          </button>
+          <button
+            type="button"
+            onClick={() => { setDurationType('days'); setDuration('1'); }}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              durationType === 'days' 
+                ? 'bg-primary text-primary-foreground shadow-sm' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Days
+          </button>
+        </div>
+
         <Select value={duration} onValueChange={setDuration}>
           <SelectTrigger className="h-12 border-2 hover:border-primary/50">
-            <SelectValue placeholder="Select hours" />
+            <SelectValue placeholder={durationType === 'hours' ? 'Select hours' : 'Select days'} />
           </SelectTrigger>
           <SelectContent className="max-h-60">
-            {hourOptions.map((option) => (
+            {(durationType === 'hours' ? hourOptions : dayOptions).map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-primary" />
@@ -292,21 +351,40 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
             ))}
           </SelectContent>
         </Select>
+
+        {/* Quick select buttons */}
         <div className="flex gap-2 flex-wrap mt-2">
-          {[1, 2, 4, 6, 8].map((hr) => (
-            <button
-              key={hr}
-              type="button"
-              onClick={() => setDuration(String(hr))}
-              className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-                duration === String(hr)
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-muted hover:bg-muted/80 border-border'
-              }`}
-            >
-              {hr} {hr === 1 ? 'hr' : 'hrs'}
-            </button>
-          ))}
+          {durationType === 'hours' ? (
+            [1, 2, 4, 6, 8].map((hr) => (
+              <button
+                key={hr}
+                type="button"
+                onClick={() => setDuration(String(hr))}
+                className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                  duration === String(hr)
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-muted hover:bg-muted/80 border-border'
+                }`}
+              >
+                {hr} {hr === 1 ? 'hr' : 'hrs'}
+              </button>
+            ))
+          ) : (
+            [1, 2, 3, 5, 7].map((day) => (
+              <button
+                key={day}
+                type="button"
+                onClick={() => setDuration(String(day))}
+                className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                  duration === String(day)
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-muted hover:bg-muted/80 border-border'
+                }`}
+              >
+                {day} {day === 1 ? 'day' : 'days'}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
@@ -321,7 +399,8 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
             <span className="font-medium">Booking for {format(date, 'EEEE, MMMM d, yyyy')}</span>
           </div>
           <div className="text-sm text-muted-foreground mt-1">
-            Duration: {hours} hours • Base cost: ₹{baseCost}
+            Duration: {durationValue} {durationType} • Base cost: ₹{Math.round(baseCost)}
+            {durationType === 'days' && <span className="text-secondary ml-1">(10% daily discount)</span>}
           </div>
         </motion.div>
       )}
@@ -535,6 +614,190 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
     </motion.div>
   );
 
+  const renderNegotiateStep = () => {
+    const minPrice = Math.floor(calculatedTotal * 0.7); // Max 30% discount
+    const maxPrice = calculatedTotal;
+    const suggestedPrices = [
+      { discount: 5, price: Math.floor(calculatedTotal * 0.95) },
+      { discount: 10, price: Math.floor(calculatedTotal * 0.90) },
+      { discount: 15, price: Math.floor(calculatedTotal * 0.85) },
+    ];
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        className="space-y-5"
+      >
+        {/* Current Price Display */}
+        <div className="p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-muted-foreground">Current Price</div>
+              <div className="text-2xl font-bold">₹{calculatedTotal}</div>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <IndianRupee className="w-6 h-6 text-primary" />
+            </div>
+          </div>
+        </div>
+
+        {/* Negotiation Toggle */}
+        <div className="p-4 bg-muted/50 rounded-xl border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-secondary" />
+              </div>
+              <div>
+                <div className="font-semibold">Want to negotiate?</div>
+                <div className="text-sm text-muted-foreground">
+                  Propose your price, owner may accept
+                </div>
+              </div>
+            </div>
+            <Switch 
+              checked={negotiationEnabled} 
+              onCheckedChange={(checked) => {
+                setNegotiationEnabled(checked);
+                if (!checked) {
+                  setProposedPrice('');
+                  setNegotiationMessage('');
+                }
+              }} 
+            />
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {negotiationEnabled && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-4 overflow-hidden"
+            >
+              {/* Quick Price Suggestions */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold flex items-center gap-2">
+                  <TrendingDown className="w-4 h-4 text-secondary" />
+                  Quick Offers
+                </Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {suggestedPrices.map(({ discount, price }) => (
+                    <button
+                      key={discount}
+                      type="button"
+                      onClick={() => setProposedPrice(String(price))}
+                      className={`p-3 rounded-xl border text-center transition-all ${
+                        proposedPrice === String(price) 
+                          ? 'border-secondary bg-secondary/10' 
+                          : 'border-border hover:border-secondary/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-1 text-secondary text-sm font-medium">
+                        <Percent className="w-3 h-3" />
+                        {discount}% off
+                      </div>
+                      <div className="font-bold">₹{price}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Price Input */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Your Offer Price</Label>
+                <div className="relative">
+                  <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    value={proposedPrice}
+                    onChange={(e) => {
+                      const value = Math.max(minPrice, Math.min(maxPrice, Number(e.target.value)));
+                      setProposedPrice(e.target.value ? String(value) : '');
+                    }}
+                    placeholder={String(Math.floor(calculatedTotal * 0.9))}
+                    className="pl-8 h-12 text-lg font-bold"
+                    min={minPrice}
+                    max={maxPrice}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Min: ₹{minPrice}</span>
+                  <span>Max: ₹{maxPrice}</span>
+                </div>
+              </div>
+
+              {/* Price Slider */}
+              <div className="px-2">
+                <Slider
+                  value={[proposedPrice ? Number(proposedPrice) : calculatedTotal]}
+                  min={minPrice}
+                  max={maxPrice}
+                  step={50}
+                  onValueChange={([value]) => setProposedPrice(String(value))}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Message to Owner */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Message to Owner (Optional)
+                </Label>
+                <Textarea
+                  value={negotiationMessage}
+                  onChange={(e) => setNegotiationMessage(e.target.value)}
+                  placeholder="e.g., I'm a regular farmer and need this for my wheat harvesting..."
+                  rows={2}
+                  className="resize-none"
+                />
+              </div>
+
+              {/* Savings Display */}
+              {proposedPrice && Number(proposedPrice) < calculatedTotal && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-secondary/10 rounded-xl border border-secondary/20"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-secondary">
+                      <TrendingDown className="w-5 h-5" />
+                      <span className="font-medium">Your Savings</span>
+                    </div>
+                    <div className="text-lg font-bold text-secondary">
+                      ₹{calculatedTotal - Number(proposedPrice)}
+                    </div>
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {Math.round(((calculatedTotal - Number(proposedPrice)) / calculatedTotal) * 100)}% discount requested
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-sm">
+                <span className="font-medium text-amber-600">Note:</span>
+                <span className="text-muted-foreground"> Owner will review your offer. Booking status will be "Pending" until accepted.</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!negotiationEnabled && (
+          <div className="p-4 bg-muted/50 rounded-xl text-center">
+            <p className="text-sm text-muted-foreground">
+              You'll pay the listed price. Enable negotiation to propose a different price.
+            </p>
+          </div>
+        )}
+      </motion.div>
+    );
+  };
+
   const renderReviewStep = () => (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -554,15 +817,15 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
             <div className="flex-1">
               <div className="font-medium">{equipment.name}</div>
               <div className="text-sm text-muted-foreground">
-                {date && format(date, 'PPP')} • {hours} hours
+                {date && format(date, 'PPP')} • {durationValue} {durationType}
               </div>
             </div>
           </div>
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('booking.base')} ({hours} {t('booking.hours')})</span>
-              <span>₹{baseCost}</span>
+              <span className="text-muted-foreground">{t('booking.base')} ({durationValue} {durationType})</span>
+              <span>₹{Math.round(baseCost)}</span>
             </div>
             
             {withOperator && (
@@ -596,12 +859,30 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
                 )}
               </>
             )}
+
+            {negotiationEnabled && negotiatedDiscount > 0 && (
+              <div className="flex justify-between text-secondary">
+                <span>Negotiated Discount</span>
+                <span>-₹{negotiatedDiscount}</span>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between font-bold text-lg pt-3 border-t">
             <span>{t('booking.totalCost')}</span>
-            <span className="text-primary">₹{totalCost}</span>
+            <div className="text-right">
+              {negotiationEnabled && proposedPrice && (
+                <div className="text-sm line-through text-muted-foreground font-normal">₹{calculatedTotal}</div>
+              )}
+              <span className="text-primary">₹{totalCost}</span>
+            </div>
           </div>
+
+          {negotiationEnabled && (
+            <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/20 text-xs text-center">
+              <span className="text-amber-600 font-medium">Pending owner approval</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -700,6 +981,7 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
           {step === 'schedule' && renderScheduleStep()}
           {step === 'operator' && renderOperatorStep()}
           {step === 'delivery' && renderDeliveryStep()}
+          {step === 'negotiate' && renderNegotiateStep()}
           {step === 'review' && renderReviewStep()}
           {step === 'success' && renderSuccessStep()}
         </AnimatePresence>

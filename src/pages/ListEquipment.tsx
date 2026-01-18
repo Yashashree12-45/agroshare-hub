@@ -181,7 +181,7 @@ const ListEquipment = () => {
                     <div className="space-y-2">
                       <Label>Equipment Type *</Label>
                       <div className="grid grid-cols-2 gap-2">
-                        {equipmentTypes.slice(0, 6).map((type) => (
+                        {equipmentTypes.map((type) => (
                           <button
                             key={type.value}
                             type="button"
@@ -197,21 +197,6 @@ const ListEquipment = () => {
                           </button>
                         ))}
                       </div>
-                      <Select
-                        value={formData.type}
-                        onValueChange={(value) => updateFormData('type', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Or select from all types" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {equipmentTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.icon} {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     </div>
 
                     <div className="grid grid-cols-3 gap-3">
@@ -287,8 +272,12 @@ const ListEquipment = () => {
                         <Input
                           type="number"
                           placeholder="500"
+                          min="0"
                           value={formData.pricePerHour}
-                          onChange={(e) => updateFormData('pricePerHour', e.target.value)}
+                          onChange={(e) => {
+                            const value = Math.max(0, Number(e.target.value));
+                            updateFormData('pricePerHour', value.toString());
+                          }}
                         />
                       </div>
                       <div className="space-y-2">
@@ -299,8 +288,12 @@ const ListEquipment = () => {
                         <Input
                           type="number"
                           placeholder="3000"
+                          min="0"
                           value={formData.pricePerDay}
-                          onChange={(e) => updateFormData('pricePerDay', e.target.value)}
+                          onChange={(e) => {
+                            const value = Math.max(0, Number(e.target.value));
+                            updateFormData('pricePerDay', value.toString());
+                          }}
                         />
                       </div>
                     </div>
