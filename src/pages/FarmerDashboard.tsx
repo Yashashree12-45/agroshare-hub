@@ -15,7 +15,13 @@ import {
   ArrowRight,
   Sparkles,
   TrendingUp,
-  ShoppingBag
+  ShoppingBag,
+  MessageSquare,
+  IndianRupee,
+  ThumbsUp,
+  ThumbsDown,
+  ArrowLeftRight,
+  Phone
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -25,7 +31,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuthStore } from '@/store/authStore';
 import { useBookingStore, Booking } from '@/store/bookingStore';
+import { useNegotiationStore, Negotiation } from '@/store/negotiationStore';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -47,10 +55,20 @@ export default function FarmerDashboard() {
   const { t } = useTranslation();
   const { user } = useAuthStore();
   const { bookings } = useBookingStore();
+  const { negotiations, farmerRespondToCounter } = useNegotiationStore();
   const navigate = useNavigate();
+
+  // Dialog state for counter-offer response
+  const [showResponseDialog, setShowResponseDialog] = useState(false);
+  const [selectedNegotiation, setSelectedNegotiation] = useState<Negotiation | null>(null);
+  const [responseAction, setResponseAction] = useState<'accept' | 'reject' | null>(null);
 
   // Filter bookings for the logged-in farmer
   const farmerBookings = bookings.filter(b => b.farmerId === user?.id);
+  
+  // Filter negotiations for the logged-in farmer
+  const farmerNegotiations = negotiations.filter(n => n.farmerId === user?.id);
+  const pendingCounterOffers = farmerNegotiations.filter(n => n.status === 'countered').length;
   
   // Get active bookings
   const activeBookings = farmerBookings.filter(
@@ -63,9 +81,201 @@ export default function FarmerDashboard() {
 
   const stats = [
     { label: 'Active Orders', value: activeBookings.length, icon: Package, color: 'text-primary', bgColor: 'bg-primary/10' },
-    { label: 'Completed', value: farmerBookings.filter(b => b.status === 'completed').length, icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-500/10' },
+    { label: 'Negotiations', value: farmerNegotiations.length, icon: MessageSquare, color: 'text-amber-600', bgColor: 'bg-amber-500/10' },
     { label: 'Total Rentals', value: farmerBookings.length, icon: ShoppingBag, color: 'text-secondary', bgColor: 'bg-secondary/10' },
   ];
+
+  const handleCounterResponse = (negotiation: Negotiation, action: 'accept' | 'reject') => {
+    setSelectedNegotiation(negotiation);
+    setResponseAction(action);
+    setShowResponseDialog(true);
+  };
+
+  const confirmResponse = () => {
+    if (selectedNegotiation && responseAction) {
+      farmerRespondToCounter(selectedNegotiation.id, responseAction === 'accept');
+      setShowResponseDialog(false);
+      setSelectedNegotiation(null);
+      setResponseAction(null);
+    }
+  };
+
+  const getNegotiationStatusBadge = (status: Negotiation['status']) => {
+    const config = {
+      pending: { color: 'bg-amber-500/10 text-amber-600 border-amber-500/20', label: 'Pending Owner Review' },
+      accepted: { color: 'bg-green-500/10 text-green-600 border-green-500/20', label: 'Accepted' },
+      rejected: { color: 'bg-destructive/10 text-destructive border-destructive/20', label: 'Rejected' },
+      countered: { color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', label: 'Counter Offer Received' },
+      farmer_accepted: { color: 'bg-green-500/10 text-green-600 border-green-500/20', label: 'You Accepted' },
+      farmer_rejected: { color: 'bg-destructive/10 text-destructive border-destructive/20', label: 'You Declined' },
+    };
+    return config[status];
+  };
+
+  const renderNegotiationCard = (negotiation: Negotiation) => {
+    const statusBadge = getNegotiationStatusBadge(negotiation.status);
+    const discount = Math.round(((negotiation.originalPrice - negotiation.proposedPrice) / negotiation.originalPrice) * 100);
+    const counterDiscount = negotiation.counterOfferPrice 
+      ? Math.round(((negotiation.originalPrice - negotiation.counterOfferPrice) / negotiation.originalPrice) * 100)
+      : 0;
+
+    return (
+      <motion.div
+        key={negotiation.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="border rounded-xl overflow-hidden bg-card"
+      >
+        <div className="p-4">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-semibold">{negotiation.equipmentName}</h3>
+              <p className="text-sm text-muted-foreground">
+                {negotiation.date} • {negotiation.duration}
+              </p>
+            </div>
+            <Badge variant="outline" className={statusBadge.color}>
+              {statusBadge.label}
+            </Badge>
+          </div>
+
+          {/* Price Comparison */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="p-3 rounded-lg bg-muted/50">
+              <p className="text-xs text-muted-foreground mb-1">Original Price</p>
+              <p className="font-semibold">₹{negotiation.originalPrice.toLocaleString()}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-primary/10">
+              <p className="text-xs text-muted-foreground mb-1">Your Offer</p>
+              <p className="font-semibold text-primary">
+                ₹{negotiation.proposedPrice.toLocaleString()}
+                <span className="text-xs ml-1">(-{discount}%)</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Your Message */}
+          {negotiation.farmerMessage && (
+            <div className="p-3 rounded-lg bg-muted/30 mb-3">
+              <p className="text-xs text-muted-foreground mb-1">Your Message</p>
+              <p className="text-sm">{negotiation.farmerMessage}</p>
+            </div>
+          )}
+
+          {/* Counter Offer Section */}
+          {negotiation.status === 'countered' && negotiation.counterOfferPrice && (
+            <div className="border-t pt-4 mt-2">
+              <div className="flex items-center gap-2 mb-3">
+                <ArrowLeftRight className="w-4 h-4 text-blue-600" />
+                <span className="font-medium text-blue-600">Owner's Counter Offer</span>
+              </div>
+              
+              <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Counter Price</span>
+                  <span className="font-bold text-lg">
+                    ₹{negotiation.counterOfferPrice.toLocaleString()}
+                    <span className="text-xs text-muted-foreground ml-1">(-{counterDiscount}%)</span>
+                  </span>
+                </div>
+                {negotiation.ownerMessage && (
+                  <p className="text-sm text-muted-foreground italic">
+                    "{negotiation.ownerMessage}"
+                  </p>
+                )}
+              </div>
+
+              {/* Savings Summary */}
+              <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 mb-4">
+                <span className="text-sm">Your Savings</span>
+                <span className="font-semibold text-green-600">
+                  ₹{(negotiation.originalPrice - negotiation.counterOfferPrice).toLocaleString()} saved!
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1 gap-2"
+                  onClick={() => handleCounterResponse(negotiation, 'accept')}
+                >
+                  <ThumbsUp className="w-4 h-4" />
+                  Accept Offer
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 gap-2"
+                  onClick={() => handleCounterResponse(negotiation, 'reject')}
+                >
+                  <ThumbsDown className="w-4 h-4" />
+                  Decline
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Status Messages for other states */}
+          {negotiation.status === 'accepted' && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 text-green-600">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">Owner accepted your offer! Booking confirmed.</span>
+            </div>
+          )}
+
+          {negotiation.status === 'rejected' && (
+            <div className="p-3 rounded-lg bg-destructive/10">
+              <div className="flex items-center gap-2 text-destructive mb-2">
+                <XCircle className="w-5 h-5" />
+                <span className="font-medium">Owner declined your offer</span>
+              </div>
+              {negotiation.ownerMessage && (
+                <p className="text-sm text-muted-foreground">"{negotiation.ownerMessage}"</p>
+              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-3"
+                onClick={() => navigate(`/equipment/${negotiation.equipmentId}`)}
+              >
+                Book at Original Price
+              </Button>
+            </div>
+          )}
+
+          {negotiation.status === 'farmer_accepted' && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 text-green-600">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">
+                You accepted at ₹{negotiation.counterOfferPrice?.toLocaleString()}. Booking confirmed!
+              </span>
+            </div>
+          )}
+
+          {negotiation.status === 'farmer_rejected' && (
+            <div className="p-3 rounded-lg bg-muted">
+              <p className="text-sm text-muted-foreground">You declined the counter offer.</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2"
+                onClick={() => navigate(`/equipment/${negotiation.equipmentId}`)}
+              >
+                Try New Offer
+              </Button>
+            </div>
+          )}
+
+          {negotiation.status === 'pending' && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 text-amber-600">
+              <Clock className="w-5 h-5" />
+              <span className="text-sm">Waiting for owner to respond to your offer...</span>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
 
   const renderOrderCard = (booking: Booking) => {
     const StatusIcon = statusConfig[booking.status].icon;
@@ -216,10 +426,19 @@ export default function FarmerDashboard() {
             transition={{ delay: 0.2 }}
           >
             <Tabs defaultValue="orders" className="space-y-4">
-              <TabsList className="w-full grid grid-cols-2">
+              <TabsList className="w-full grid grid-cols-3">
                 <TabsTrigger value="orders" className="gap-2">
                   <Package className="w-4 h-4" />
-                  My Orders
+                  Orders
+                </TabsTrigger>
+                <TabsTrigger value="negotiations" className="gap-2 relative">
+                  <MessageSquare className="w-4 h-4" />
+                  Offers
+                  {pendingCounterOffers > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center">
+                      {pendingCounterOffers}
+                    </span>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger value="discover" className="gap-2">
                   <Sparkles className="w-4 h-4" />
@@ -246,6 +465,48 @@ export default function FarmerDashboard() {
                 ) : (
                   <div className="space-y-3">
                     {farmerBookings.map(renderOrderCard)}
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Negotiations Tab */}
+              <TabsContent value="negotiations" className="space-y-4">
+                {farmerNegotiations.length === 0 ? (
+                  <Card className="border-dashed">
+                    <CardContent className="p-12 text-center">
+                      <MessageSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No negotiations yet</h3>
+                      <p className="text-muted-foreground mb-4">
+                        When you negotiate prices during booking, they'll appear here
+                      </p>
+                      <Button onClick={() => navigate('/equipment')}>
+                        Browse Equipment
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {/* Counter offers needing response first */}
+                    {farmerNegotiations.filter(n => n.status === 'countered').length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-blue-600" />
+                          Requires Your Response
+                        </h3>
+                        {farmerNegotiations.filter(n => n.status === 'countered').map(renderNegotiationCard)}
+                      </div>
+                    )}
+                    
+                    {/* Other negotiations */}
+                    {farmerNegotiations.filter(n => n.status !== 'countered').length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2">All Negotiations</h3>
+                        <div className="space-y-3">
+                          {farmerNegotiations.filter(n => n.status !== 'countered').map(renderNegotiationCard)}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </TabsContent>
@@ -322,6 +583,69 @@ export default function FarmerDashboard() {
       </main>
 
       <Footer />
+
+      {/* Response Confirmation Dialog */}
+      <Dialog open={showResponseDialog} onOpenChange={setShowResponseDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {responseAction === 'accept' ? 'Accept Counter Offer?' : 'Decline Counter Offer?'}
+            </DialogTitle>
+            <DialogDescription>
+              {responseAction === 'accept' ? (
+                <>
+                  You're accepting the owner's counter offer of{' '}
+                  <span className="font-semibold text-primary">
+                    ₹{selectedNegotiation?.counterOfferPrice?.toLocaleString()}
+                  </span>
+                  . The booking will be confirmed at this price.
+                </>
+              ) : (
+                'Are you sure you want to decline this counter offer? You can always make a new offer later.'
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedNegotiation && responseAction === 'accept' && (
+            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+              <div className="flex items-center justify-between">
+                <span>Final Price</span>
+                <span className="font-bold text-lg text-green-600">
+                  ₹{selectedNegotiation.counterOfferPrice?.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between mt-2 text-sm text-muted-foreground">
+                <span>You Save</span>
+                <span>
+                  ₹{(selectedNegotiation.originalPrice - (selectedNegotiation.counterOfferPrice || 0)).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowResponseDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmResponse}
+              variant={responseAction === 'accept' ? 'default' : 'destructive'}
+            >
+              {responseAction === 'accept' ? (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Confirm Acceptance
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Decline Offer
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
