@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Equipment from "./pages/Equipment";
 import EquipmentDetail from "./pages/EquipmentDetail";
@@ -34,22 +35,25 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
-            <Route path="/equipment" element={<Equipment />} />
-            <Route path="/equipment/:id" element={<EquipmentDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<FarmerDashboard />} />
-            <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-            <Route path="/operator-dashboard" element={<OperatorDashboard />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/bookings" element={<BookingHistory />} />
-            <Route path="/tracking" element={<GPSTracking />} />
-            <Route path="/ai-recommend" element={<AIRecommendation />} />
-            <Route path="/wallet" element={<Wallet />} />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/list-equipment" element={<ListEquipment />} />
-            <Route path="/settings" element={<Settings />} />
+            
+            {/* Protected routes */}
+            <Route path="/equipment" element={<ProtectedRoute><Equipment /></ProtectedRoute>} />
+            <Route path="/equipment/:id" element={<ProtectedRoute><EquipmentDetail /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><FarmerDashboard /></ProtectedRoute>} />
+            <Route path="/owner-dashboard" element={<ProtectedRoute><OwnerDashboard /></ProtectedRoute>} />
+            <Route path="/operator-dashboard" element={<ProtectedRoute><OperatorDashboard /></ProtectedRoute>} />
+            <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/bookings" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+            <Route path="/tracking" element={<ProtectedRoute><GPSTracking /></ProtectedRoute>} />
+            <Route path="/ai-recommend" element={<ProtectedRoute><AIRecommendation /></ProtectedRoute>} />
+            <Route path="/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
+            <Route path="/list-equipment" element={<ProtectedRoute><ListEquipment /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ChatBot />
