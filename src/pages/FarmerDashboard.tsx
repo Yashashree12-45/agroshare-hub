@@ -35,6 +35,7 @@ import { useNegotiationStore, Negotiation } from '@/store/negotiationStore';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
 
 const statusConfig = {
   pending: { color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20', icon: AlertCircle, label: 'Pending' },
@@ -94,6 +95,19 @@ export default function FarmerDashboard() {
   const confirmResponse = () => {
     if (selectedNegotiation && responseAction) {
       farmerRespondToCounter(selectedNegotiation.id, responseAction === 'accept');
+      
+      if (responseAction === 'accept') {
+        toast({
+          title: 'Counter-offer Accepted! 🎉',
+          description: `You accepted ₹${selectedNegotiation.counterOfferPrice?.toLocaleString()} for ${selectedNegotiation.equipmentName}. Your booking is confirmed!`,
+        });
+      } else {
+        toast({
+          title: 'Counter-offer Declined',
+          description: `You declined the counter-offer for ${selectedNegotiation.equipmentName}.`,
+        });
+      }
+      
       setShowResponseDialog(false);
       setSelectedNegotiation(null);
       setResponseAction(null);

@@ -196,15 +196,21 @@ const OwnerDashboard = () => {
     switch (negotiationAction) {
       case 'accept':
         acceptNegotiation(selectedNegotiation.id);
-        toast.success('Offer accepted! The farmer will be notified.');
+        toast.success('Offer accepted!', {
+          description: `You accepted ₹${selectedNegotiation.proposedPrice.toLocaleString()} for ${selectedNegotiation.equipmentName}. The farmer has been notified.`,
+        });
         break;
       case 'reject':
         rejectNegotiation(selectedNegotiation.id, rejectMessage);
-        toast.success('Offer declined.');
+        toast.success('Offer declined.', {
+          description: `You declined the offer from ${selectedNegotiation.farmerName}.`,
+        });
         break;
       case 'counter':
         counterOffer(selectedNegotiation.id, counterPrice, counterMessage);
-        toast.success('Counter-offer sent to farmer!');
+        toast.success('Counter-offer sent!', {
+          description: `Your counter-offer of ₹${counterPrice.toLocaleString()} has been sent to ${selectedNegotiation.farmerName}.`,
+        });
         break;
     }
     setShowNegotiationDialog(false);
