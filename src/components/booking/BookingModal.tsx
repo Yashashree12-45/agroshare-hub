@@ -26,6 +26,7 @@ import {
 import { Equipment } from '@/services/api';
 import { useBookingStore } from '@/store/bookingStore';
 import { useAuthStore } from '@/store/authStore';
+import { useNegotiationStore } from '@/store/negotiationStore';
 import { Operator } from '@/store/operatorStore';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -78,8 +79,9 @@ const stepConfig = [
 export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { addBooking } = useBookingStore();
+  const { addNegotiation } = useNegotiationStore();
   
   const [step, setStep] = useState<BookingStep>('schedule');
   const [date, setDate] = useState<Date | undefined>(undefined);
@@ -198,11 +200,14 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
     }
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    const bookingId = `BK-${Date.now()}`;
+    
     addBooking({
-      id: Date.now().toString(),
+      id: bookingId,
       equipmentId: equipment.id,
       equipmentName: equipment.name,
-      farmerId: '1',
+      farmerId: user?.id || '1',
       ownerId: equipment.owner.id,
       startDate: date,
       endDate: date,
@@ -213,6 +218,35 @@ export function BookingModal({ equipment, open, onClose }: BookingModalProps) {
       location: `${equipment.location.village}, ${equipment.location.district}`,
       createdAt: new Date(),
     });
+    
+    // If negotiation is enabled, add to negotiation store
+    if (negotiationEnabled && proposedPrice) {
+      addNegotiation({
+        id: `NEG-${Date.now()}`,
+        bookingId,
+        equipmentId: equipment.id,
+        equipmentName: equipment.name,
+        farmerId: user?.id || '1',
+        farmerName: user?.name || 'Farmer',
+        farmerPhone: user?.phone || '+91 98765 43210',
+        ownerId: equipment.owner.id,
+        originalPrice: calculatedTotal,
+        proposedPrice: Number(proposedPrice),
+        status: 'pending',
+        duration: durationType === 'days' ? `${durationValue} days` : `${hours} hours`,
+        date: format(date, 'yyyy-MM-dd'),
+        withOperator,
+        farmerMessage: negotiationMessage || undefined,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      
+      toast({
+        title: 'Negotiation Request Sent!',
+        description: 'The equipment owner will review your offer and respond soon.',
+      });
+    }
+    
     setLoading(false);
     setStep('success');
   };
